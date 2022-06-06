@@ -1,0 +1,66 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+steps:
+- id: 'Build AlphaFold components image'
+  name: 'gcr.io/cloud-builders/docker' 
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/$_AF_COMPONENTS_IMAGE:$_TAG', '-f', '$_AF_COMPONENTS_DOCKER', '.']
+  dir: src 
+- id: 'Copy AlphaFold datasets to Filestore'
+  name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+      set -e
+
+      network_id=$(echo $_NETWORK_ID | sed "s#$PROJECT_ID#$PROJECT_NUMBER#")
+      sed -i s#NETWORK_ID#${network_id}#g vertex-training-template.yaml 
+      sed -i s#FILESTORE_IP#${_FILESTORE_IP}#g vertex-training-template.yaml
+      sed -i s#FILESHARE#${_FILESHARE}#g vertex-training-template.yaml
+      sed -i s#MOUNT_POINT#${_MOUNT_POINT}#g vertex-training-template.yaml
+      sed -i s#GCS_PATH#${_GCS_PATH}#g vertex-training-template.yaml
+
+      job=$(gcloud ai custom-jobs create --region ${_REGION} --display-name populate_filestore --config vertex-training-template.yaml --format "value(name)")
+      while true
+      do
+        status=$(gcloud ai custom-jobs describe $job --format "value(state)")
+        echo "$status"
+        if [[ "$status" == "JOB_STATE_SUCCEEDED" || "$status" == "JOB_STATE_FAILED" || "$status" == "JOB_STATE_CANCELLED" ]]
+        then
+          break
+        fi
+        sleep 60
+      done
+      if [[ "$status" == "JOB_STATE_SUCCEEDED" ]]
+      then
+        exit 0
+      else
+        exit 1
+      fi
+  dir: env-setup/filestore_config
+- id: Copy AlphaFold parameters to GCS
+  name: 'gcr.io/cloud-builders/gsutil'
+  args: ['-m', 'cp', '-r', '${_GCS_PATH}/params', '${_GCS_PARAMS_PATH}']
+      
+substitutions:
+    _MOUNT_POINT: /mnt/nfs/datasets
+    _AF_COMPONENTS_IMAGE: alphafold-components
+    _TAG: latest
+    _AF_COMPONENTS_DOCKER: Dockerfile
+
+images: ['gcr.io/$PROJECT_ID/${_AF_COMPONENTS_IMAGE}']
+
+  
+
