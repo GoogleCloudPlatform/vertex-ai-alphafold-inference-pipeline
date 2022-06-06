@@ -69,11 +69,10 @@ def configure_run(
   models = config.MODEL_PRESETS[model_preset]
   if random_seed is None:
     random_seed = random.randrange(
-        sys.maxsize // len(models) * num_multimer_predictions_per_model)
+        sys.maxsize // (len(models) * num_multimer_predictions_per_model)
+    )
 
-  num_models = len(models)
   model_runners = []
-  random_seed = random_seed * (num_models * num_predictions_per_model)
   for model_name in models:
     for i in range(num_predictions_per_model):
       model_runners.append({
