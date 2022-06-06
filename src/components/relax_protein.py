@@ -19,6 +19,7 @@ from kfp.v2.dsl import Input
 from kfp.v2.dsl import Output
 
 from src import config
+from typing import List
 
 
 @dsl.component(
@@ -30,7 +31,7 @@ def relax(
     max_iterations: int = 0,
     tolerance: float = 2.39,
     stiffness: float = 10.0,
-    exclude_residues: list[str] = [],
+    exclude_residues: List[str] = [],
     max_outer_iterations: int = 3,
     use_gpu: bool = True
 ):
