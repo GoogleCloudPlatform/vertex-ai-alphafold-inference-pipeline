@@ -45,7 +45,8 @@ def alphafold_inference_pipeline(
     max_template_date: str,
     model_preset: str = 'monomer',
     use_small_bfd: bool = True,
-    num_multimer_predictions_per_model: int = 5
+    num_multimer_predictions_per_model: int = 5,
+    is_run_relax: bool = True
 ):
   """Universal Alphafold Inference Pipeline."""
   run_config = ConfigureRunOp(
@@ -89,7 +90,6 @@ def alphafold_inference_pipeline(
   ).set_display_name('Prepare Features')
 
   with dsl.ParallelFor(run_config.outputs['model_runners']) as model_runner:
-
     model_predict = PredictOp(
         model_features=data_pipeline.outputs['features'],
         model_params=model_parameters.output,
@@ -107,18 +107,21 @@ def alphafold_inference_pipeline(
     model_predict.set_env_variable(
         'TF_FORCE_UNIFIED_MEMORY', config.TF_FORCE_UNIFIED_MEMORY)
     model_predict.set_env_variable(
-        'XLA_PYTHON_CLIENT_MEM_FRACTION', config.XLA_PYTHON_CLIENT_MEM_FRACTION)
+        'XLA_PYTHON_CLIENT_MEM_FRACTION', 
+        config.XLA_PYTHON_CLIENT_MEM_FRACTION)
 
-    relax_protein = RelaxOp(
+    with dsl.Condition(is_run_relax == True):
+      relax_protein = RelaxOp(
         unrelaxed_protein=model_predict.outputs['unrelaxed_protein'],
         use_gpu=True,
-    ).set_display_name('Relax protein')
-    relax_protein.set_cpu_limit(config.RELAX_CPU_LIMIT)
-    relax_protein.set_memory_limit(config.RELAX_MEMORY_LIMIT)
-    relax_protein.set_gpu_limit(config.RELAX_GPU_LIMIT)
-    relax_protein.add_node_selector_constraint(
+      ).set_display_name('Relax protein')
+      relax_protein.set_cpu_limit(config.RELAX_CPU_LIMIT)
+      relax_protein.set_memory_limit(config.RELAX_MEMORY_LIMIT)
+      relax_protein.set_gpu_limit(config.RELAX_GPU_LIMIT)
+      relax_protein.add_node_selector_constraint(
         config.GKE_ACCELERATOR_KEY, config.RELAX_GPU_TYPE)
-    relax_protein.set_env_variable(
+      relax_protein.set_env_variable(
         'TF_FORCE_UNIFIED_MEMORY', config.TF_FORCE_UNIFIED_MEMORY)
-    relax_protein.set_env_variable(
-        'XLA_PYTHON_CLIENT_MEM_FRACTION', config.XLA_PYTHON_CLIENT_MEM_FRACTION)
+      relax_protein.set_env_variable(
+        'XLA_PYTHON_CLIENT_MEM_FRACTION', 
+        config.XLA_PYTHON_CLIENT_MEM_FRACTION)
