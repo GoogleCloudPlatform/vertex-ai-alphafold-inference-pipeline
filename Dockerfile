@@ -23,11 +23,10 @@ ARG ALPHAFOLD_VERSION=v2.2.1
 # Use bash to support string substitution.
 SHELL ["/bin/bash", "-c"]
 
-RUN apt-get update && CUDA_HYPHENS=${CUDA//./-} DEBIAN_FRONTEND=noninteractive \
-      apt-get install -y \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
         build-essential \
         cmake \
-        cuda-command-line-tools-$(cut -f1,2 -d- <<< ${CUDA_HYPHENS}) \
+        cuda-command-line-tools-$(cut -f1,2 -d- <<< ${CUDA//./-}) \
         git \
         hmmer \
         kalign \
