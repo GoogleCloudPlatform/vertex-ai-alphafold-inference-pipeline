@@ -46,7 +46,7 @@ def alphafold_inference_pipeline(
     model_preset: str = 'monomer',
     use_small_bfd: bool = True,
     num_multimer_predictions_per_model: int = 5,
-    is_run_relax: bool = True
+    is_run_relax: str = 'relax'
 ):
   """Universal Alphafold Inference Pipeline."""
   run_config = ConfigureRunOp(
@@ -110,7 +110,7 @@ def alphafold_inference_pipeline(
         'XLA_PYTHON_CLIENT_MEM_FRACTION', 
         config.XLA_PYTHON_CLIENT_MEM_FRACTION)
 
-    with dsl.Condition(is_run_relax == True):
+    with dsl.Condition(is_run_relax == 'relax'):
       relax_protein = RelaxOp(
         unrelaxed_protein=model_predict.outputs['unrelaxed_protein'],
         use_gpu=True,
