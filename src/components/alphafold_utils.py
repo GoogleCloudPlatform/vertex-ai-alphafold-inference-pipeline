@@ -246,7 +246,7 @@ def relax_protein(
     max_iterations: int = 0,
     tolerance: float = 2.39,
     stiffness: float = 10.0,
-    exclude_residues: list[str] = [],
+    exclude_residues: List[str] = [],
     max_outer_iterations: int = 3,
     use_gpu=False
 ) -> Mapping[str, str]:
@@ -333,7 +333,7 @@ def run_jackhmmer(
 def run_hhblits(
     input_path: str,
     msa_path: str,
-    database_paths: Sequence[str],
+    database_paths: List[str],
     n_cpu: int,
     maxseq: int
 ):
@@ -359,7 +359,7 @@ def run_hhsearch(
     msa_data_format: str,
     template_hits_path: str,
     template_features_path: str,
-    template_dbs_paths: list[str],
+    template_dbs_paths: List[str],
     mmcif_path: str,
     obsolete_path: str,
     max_template_date: str,
