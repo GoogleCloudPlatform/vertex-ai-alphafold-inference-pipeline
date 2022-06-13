@@ -17,7 +17,7 @@ FROM nvidia/cuda:${CUDA}-cudnn8-runtime-ubuntu18.04
 # FROM directive resets ARGS, so we specify again (the value is retained if
 # previously set).
 ARG CUDA
-ARG ALPHAFOLD_VERSION=v2.2.1
+ARG ALPHAFOLD_VERSION=v2.2.2
 
 
 # Use bash to support string substitution.
