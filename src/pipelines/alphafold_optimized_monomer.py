@@ -70,7 +70,7 @@ def alphafold_monomer_pipeline(
     max_template_date: str,
     uniref_max_hits: int = config.UNIREF_MAX_HITS,
     mgnify_max_hits: int = config.MGNIFY_MAX_HITS,
-    is_run_relax: bool = True
+    is_run_relax: str = 'relax'
 ):
   """Monomer-optimized Alphafold Inference Pipeline."""
   run_config = ConfigureRunOp(
@@ -185,7 +185,7 @@ def alphafold_monomer_pipeline(
         'XLA_PYTHON_CLIENT_MEM_FRACTION', 
         config.XLA_PYTHON_CLIENT_MEM_FRACTION)
 
-    with dsl.Condition(is_run_relax == True):
+    with dsl.Condition(is_run_relax == 'relax'):
       relax_protein = RelaxOp(
         unrelaxed_protein=model_predict.outputs['unrelaxed_protein'],
         use_gpu=True,
