@@ -128,8 +128,8 @@ servicenetworking.googleapis.com
 First, clone the demo repo.
 
 ```
-git clone https://github.com/jarokaz/alphafold-on-vertex.git
-cd alphafold-on-vertex/env-setup
+git clone https://github.com/GoogleCloudPlatform/vertex-ai-alphafold-inference-pipeline.git
+cd vertex-ai-alphafold-inference-pipeline/env-setup
 ```
 
 Set the below environment variables to reflect your environment. The Terraform will attempt to create new resources so make sure that the resources with the specified names do not already exist. 
@@ -188,7 +188,7 @@ From the JupyterLab terminal:
 ### Step 1. Clone the demo repo.
 
 ```
-git clone https://github.com/jarokaz/alphafold-on-vertex.git
+git clone https://github.com/GoogleCloudPlatform/vertex-ai-alphafold-inference-pipeline.git
 ```
 
 ### Step 2. Build the container image that encapsulates custom KFP components used by the inference pipelines
@@ -197,7 +197,7 @@ git clone https://github.com/jarokaz/alphafold-on-vertex.git
 PROJECT_ID=$(gcloud config list --format 'value(core.project)')
 IMAGE_URI=gcr.io/${PROJECT_ID}/alphafold-components
 
-cd alphafold-on-vertex
+cd vertex-ai-alphafold-inference-pipeline
 gcloud builds submit --timeout "2h" --tag ${IMAGE_URI} . --machine-type=e2-highcpu-8
 ```
 
@@ -211,7 +211,7 @@ You are now ready to walk through the sample notebooks that demonstrate how to r
 If you want to remove the resource created for the demo execute the following command from Cloud Shell.
 
 ```
-cd ~/alphafold-on-vertex/env-setup
+cd ~/vertex-ai-alphafold-inference-pipeline/env-setup
 
 terraform destroy \
 -var=project_id=$PROJECT_ID \
