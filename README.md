@@ -123,7 +123,7 @@ servicenetworking.googleapis.com
 ### Step 3 - Run the Terraform configuration
 
 
-First, clone the demo repo.
+First, clone the repo.
 
 ```
 git clone https://github.com/GoogleCloudPlatform/vertex-ai-alphafold-inference-pipeline.git
