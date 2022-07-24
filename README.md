@@ -139,7 +139,7 @@ Set the below environment variables to reflect your environment. The Terraform w
 - `WORKBENCH_INSTANCE_NAME` - the name for the Vertex Workbench instance
 - `FILESTORE_INSTANCE_ID` - the instance ID of the Filestore instance. See [Naming your instance](https://cloud.google.com/filestore/docs/creating-instances#naming_your_instance)
 - `GCS_BUCKET_NAME` - the name of the GCS regional bucket. See [Bucket naming guidelines](https://cloud.google.com/storage/docs/naming-buckets) 
-- `GCS_DBS_PATH` - the path to the GCS location of the genetic databases and model parameters. Terraform will copy the databases replicating a folder structure on GCS. Terrafom will also copy model parameters to the regional bucket. The parameters should be in the `gs:<GCS_DBS_PATH>/params`
+- `GCS_DBS_PATH` - the path to the GCS location of the genetic databases and model parameters. Terraform will copy the databases replicating a folder structure on GCS. Terrafom will also copy model parameters to the regional bucket. The parameters should be in the `<GCS_DBS_PATH>/params`
 
 
 ```
