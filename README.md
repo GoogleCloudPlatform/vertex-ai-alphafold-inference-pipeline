@@ -6,7 +6,7 @@ This repository compiles prescriptive guidance and code samples demonstrating ho
 
 The following diagram depicts the architecture of the solution.
 
-![Architecture](/images/alphafold-vertex.png)
+![Architecture](/images/alphafold-vertex-v1.png)
 
 Key design patterns:
 
