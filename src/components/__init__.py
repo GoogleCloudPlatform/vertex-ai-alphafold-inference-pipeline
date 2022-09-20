@@ -21,3 +21,4 @@ from .hhsearch import hhsearch
 from .jackhmmer import jackhmmer
 from .model_predict import predict
 from .relax_protein import relax
+from .predict_relax import predict_relax

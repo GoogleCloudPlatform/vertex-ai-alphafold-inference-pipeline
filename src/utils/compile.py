@@ -21,15 +21,16 @@ from absl import flags
 from absl import app
 from absl import logging
 from datetime import datetime
-from importlib import import_module
 
 from google.cloud import aiplatform as vertex_ai
 from google.cloud import filestore_v1
+from google.cloud import resourcemanager_v3
 
 from kfp.v2 import compiler
 
 
 flags.DEFINE_string('project', 'jk-mlops-dev', 'GCP Project')
+flags.DEFINE_string('project_number',None , 'Project number')
 flags.DEFINE_string('filestore_instance_id', 'jk-af-dev-fs', 'Filestore instance ID')
 flags.DEFINE_string('filestore_instance_location', 'us-central1-a', 'Filestore instance location')
 flags.DEFINE_string('filestore_share', '/datasets', 'Filestore share')
@@ -54,18 +55,25 @@ def _get_fun_by_name(fun_string: str):
     return func, fun_name
 
 def _get_filestore_info(project_id: str, instance_id: str, location: str):
+    client = resourcemanager_v3.ProjectsClient()
+    response = client.get_project(name=f'projects/{project_id}')
+    project_number = response.name.split('/')[1]
+
     client = filestore_v1.CloudFilestoreManagerClient()
     instance_name = f'projects/{project_id}/locations/{location}/instances/{instance_id}'
     response = client.get_instance(name=instance_name)
+    network = response.networks[0].network 
+    network = network.replace(project_id, project_number, 1)
 
-    return response.networks[0].ip_addresses[0], response.networks[0].network
+    return response.networks[0].ip_addresses[0], network 
 
 def _main(argv):
-    
+
     ip_address, network = _get_filestore_info(FLAGS.project, 
                                               FLAGS.filestore_instance_id, 
                                               FLAGS.filestore_instance_location)
-    os.environ['APHAFOLD_COMPONENTS_IMAGE'] = FLAGS.alphafold_components_image
+
+    os.environ['ALPHAFOLD_COMPONENTS_IMAGE'] = FLAGS.alphafold_components_image
     os.environ['NFS_SERVER'] = ip_address
     os.environ['NFS_PATH'] = FLAGS.filestore_share
     os.environ['NETWORK'] = network 

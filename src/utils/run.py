@@ -35,7 +35,7 @@ flags.DEFINE_string('pipelines_sa', 'pipelines-sa@jk-mlops-dev.iam.gserviceaccou
 flags.DEFINE_string('pipeline_template_path', None, 'A path to the output JSON file for the pipeline IR')
 flags.DEFINE_string('params', None, 'Runtime parameters')
 flags.DEFINE_string('experiment_id', None, 'Experiment ID')
-flags.DEFINE_bool('enable_caching', False, 'Enable pipeline level caching')
+flags.DEFINE_bool('enable_caching', True, 'Enable pipeline level caching')
 
 flags.mark_flag_as_required('pipeline_template_path')
 flags.mark_flag_as_required('params')

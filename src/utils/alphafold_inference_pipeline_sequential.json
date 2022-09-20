@@ -1,89 +1,6 @@
 {
   "pipelineSpec": {
     "components": {
-      "comp-condition-2": {
-        "dag": {
-          "tasks": {
-            "relax": {
-              "cachingOptions": {
-                "enableCache": true
-              },
-              "componentRef": {
-                "name": "comp-relax"
-              },
-              "inputs": {
-                "artifacts": {
-                  "unrelaxed_protein": {
-                    "componentInputArtifact": "pipelineparam--predict-unrelaxed_protein"
-                  }
-                },
-                "parameters": {
-                  "exclude_residues": {
-                    "runtimeValue": {
-                      "constantValue": {
-                        "stringValue": "[]"
-                      }
-                    }
-                  },
-                  "max_iterations": {
-                    "runtimeValue": {
-                      "constantValue": {
-                        "intValue": "0"
-                      }
-                    }
-                  },
-                  "max_outer_iterations": {
-                    "runtimeValue": {
-                      "constantValue": {
-                        "intValue": "3"
-                      }
-                    }
-                  },
-                  "stiffness": {
-                    "runtimeValue": {
-                      "constantValue": {
-                        "doubleValue": 10.0
-                      }
-                    }
-                  },
-                  "tolerance": {
-                    "runtimeValue": {
-                      "constantValue": {
-                        "doubleValue": 2.39
-                      }
-                    }
-                  },
-                  "use_gpu": {
-                    "runtimeValue": {
-                      "constantValue": {
-                        "intValue": "1"
-                      }
-                    }
-                  }
-                }
-              },
-              "taskInfo": {
-                "name": "Relax protein"
-              }
-            }
-          }
-        },
-        "inputDefinitions": {
-          "artifacts": {
-            "pipelineparam--predict-unrelaxed_protein": {
-              "artifactType": {
-                "schemaTitle": "system.Artifact",
-                "schemaVersion": "0.0.1"
-              }
-            }
-          },
-          "parameters": {
-            "pipelineparam--is_run_relax": {
-              "type": "STRING"
-            }
-          }
-        }
-      },
       "comp-configure-run": {
         "executorLabel": "exec-configure-run",
         "inputDefinitions": {
@@ -217,115 +134,6 @@
           }
         }
       },
-      "comp-for-loop-1": {
-        "dag": {
-          "tasks": {
-            "condition-2": {
-              "componentRef": {
-                "name": "comp-condition-2"
-              },
-              "dependentTasks": [
-                "predict"
-              ],
-              "inputs": {
-                "artifacts": {
-                  "pipelineparam--predict-unrelaxed_protein": {
-                    "taskOutputArtifact": {
-                      "outputArtifactKey": "unrelaxed_protein",
-                      "producerTask": "predict"
-                    }
-                  }
-                },
-                "parameters": {
-                  "pipelineparam--is_run_relax": {
-                    "componentInputParameter": "pipelineparam--is_run_relax"
-                  }
-                }
-              },
-              "taskInfo": {
-                "name": "condition-2"
-              },
-              "triggerPolicy": {
-                "condition": "inputs.parameters['pipelineparam--is_run_relax'].string_value == 'relax'"
-              }
-            },
-            "predict": {
-              "cachingOptions": {
-                "enableCache": true
-              },
-              "componentRef": {
-                "name": "comp-predict"
-              },
-              "inputs": {
-                "artifacts": {
-                  "model_features": {
-                    "componentInputArtifact": "pipelineparam--data-pipeline-features"
-                  },
-                  "model_params": {
-                    "componentInputArtifact": "pipelineparam--importer-artifact"
-                  }
-                },
-                "parameters": {
-                  "model_name": {
-                    "componentInputParameter": "pipelineparam--configure-run-model_runners-loop-item",
-                    "parameterExpressionSelector": "parseJson(string_value)[\"model_name\"]"
-                  },
-                  "num_ensemble": {
-                    "componentInputParameter": "pipelineparam--configure-run-num_ensemble"
-                  },
-                  "prediction_index": {
-                    "componentInputParameter": "pipelineparam--configure-run-model_runners-loop-item",
-                    "parameterExpressionSelector": "parseJson(string_value)[\"prediction_index\"]"
-                  },
-                  "random_seed": {
-                    "componentInputParameter": "pipelineparam--configure-run-model_runners-loop-item",
-                    "parameterExpressionSelector": "parseJson(string_value)[\"random_seed\"]"
-                  },
-                  "run_multimer_system": {
-                    "componentInputParameter": "pipelineparam--configure-run-run_multimer_system"
-                  }
-                }
-              },
-              "taskInfo": {
-                "name": "Predict"
-              }
-            }
-          }
-        },
-        "inputDefinitions": {
-          "artifacts": {
-            "pipelineparam--data-pipeline-features": {
-              "artifactType": {
-                "schemaTitle": "system.Artifact",
-                "schemaVersion": "0.0.1"
-              }
-            },
-            "pipelineparam--importer-artifact": {
-              "artifactType": {
-                "schemaTitle": "system.Artifact",
-                "schemaVersion": "0.0.1"
-              }
-            }
-          },
-          "parameters": {
-            "pipelineparam--configure-run-model_runners": {
-              "type": "STRING"
-            },
-            "pipelineparam--configure-run-model_runners-loop-item": {
-              "type": "STRING"
-            },
-            "pipelineparam--configure-run-num_ensemble": {
-              "type": "INT"
-            },
-            "pipelineparam--configure-run-run_multimer_system": {
-              "type": "STRING"
-            },
-            "pipelineparam--is_run_relax": {
-              "type": "STRING"
-            }
-          }
-        }
-      },
       "comp-importer": {
         "executorLabel": "exec-importer",
         "inputDefinitions": {
@@ -366,8 +174,8 @@
           }
         }
       },
-      "comp-predict": {
-        "executorLabel": "exec-predict",
+      "comp-predict-relax": {
+        "executorLabel": "exec-predict-relax",
         "inputDefinitions": {
           "artifacts": {
             "model_features": {
@@ -384,75 +192,35 @@
             }
           },
           "parameters": {
-            "model_name": {
-              "type": "STRING"
-            },
             "num_ensemble": {
               "type": "INT"
             },
-            "prediction_index": {
-              "type": "INT"
-            },
-            "random_seed": {
-              "type": "INT"
+            "prediction_runners": {
+              "type": "STRING"
             },
             "run_multimer_system": {
               "type": "STRING"
-            }
-          }
-        },
-        "outputDefinitions": {
-          "artifacts": {
-            "raw_prediction": {
-              "artifactType": {
-                "schemaTitle": "system.Artifact",
-                "schemaVersion": "0.0.1"
-              }
             },
-            "unrelaxed_protein": {
-              "artifactType": {
-                "schemaTitle": "system.Artifact",
-                "schemaVersion": "0.0.1"
-              }
-            }
-          }
-        }
-      },
-      "comp-relax": {
-        "executorLabel": "exec-relax",
-        "inputDefinitions": {
-          "artifacts": {
-            "unrelaxed_protein": {
-              "artifactType": {
-                "schemaTitle": "system.Artifact",
-                "schemaVersion": "0.0.1"
-              }
-            }
-          },
-          "parameters": {
-            "exclude_residues": {
-              "type": "STRING"
-            },
-            "max_iterations": {
-              "type": "INT"
-            },
-            "max_outer_iterations": {
-              "type": "INT"
-            },
-            "stiffness": {
-              "type": "DOUBLE"
-            },
-            "tolerance": {
-              "type": "DOUBLE"
-            },
-            "use_gpu": {
+            "run_relax": {
               "type": "STRING"
             }
           }
         },
         "outputDefinitions": {
           "artifacts": {
-            "relaxed_protein": {
+            "raw_predictions": {
+              "artifactType": {
+                "schemaTitle": "system.Artifact",
+                "schemaVersion": "0.0.1"
+              }
+            },
+            "relaxed_proteins": {
+              "artifactType": {
+                "schemaTitle": "system.Artifact",
+                "schemaVersion": "0.0.1"
+              }
+            },
+            "unrelaxed_proteins": {
               "artifactType": {
                 "schemaTitle": "system.Artifact",
                 "schemaVersion": "0.0.1"
@@ -545,13 +313,13 @@
             }
           }
         },
-        "exec-predict": {
+        "exec-predict-relax": {
           "container": {
             "args": [
               "--executor_input",
               "{{$}}",
               "--function_to_execute",
-              "predict"
+              "predict_relax"
             ],
             "command": [
               "sh",
@@ -560,7 +328,7 @@
               "sh",
               "-ec",
               "program_path=$(mktemp -d)\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\npython3 -m kfp.v2.components.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
-              "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing import *\n\ndef predict(\n    model_features: Input[Artifact],\n    model_params: Input[Artifact],\n    model_name: str,\n    prediction_index: int,\n    num_ensemble: int,\n    run_multimer_system: bool,\n    random_seed: int,\n    raw_prediction: Output[Artifact],\n    unrelaxed_protein: Output[Artifact]\n):\n  \"\"\"Configures and runs AlphaFold model runner.\"\"\"\n\n  import logging\n  import time\n\n  from alphafold_utils import predict as alphafold_predict\n\n  logging.info(f'Starting model prediction {prediction_index} using model {model_name}...')\n  t0 = time.time()\n\n  raw_prediction.uri = f'{raw_prediction.uri}.pkl'\n  unrelaxed_protein.uri = f'{unrelaxed_protein.uri}.pdb'\n  prediction_result = alphafold_predict(\n      model_features_path=model_features.path,\n      model_params_path=model_params.path,\n      model_name=model_name,\n      num_ensemble=num_ensemble,\n      run_multimer_system=run_multimer_system,\n      random_seed=random_seed,\n      raw_prediction_path=raw_prediction.path,\n      unrelaxed_protein_path=unrelaxed_protein.path\n  )\n\n  raw_prediction.metadata['category'] = 'raw_prediction'\n  raw_prediction.metadata['prediction_index'] = prediction_index\n  raw_prediction.metadata['ranking_confidence'] = prediction_result[\n      'ranking_confidence']\n  unrelaxed_protein.metadata['category'] = 'unrelaxed_protein'\n\n  t1 = time.time()\n  logging.info(f'Model prediction completed. Elapsed time: {t1-t0}')\n\n"
+              "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing import *\n\ndef predict_relax(\n    model_features: Input[Artifact],\n    model_params: Input[Artifact],\n    prediction_runners: list,\n    num_ensemble: int,\n    run_multimer_system: bool,\n    run_relax: bool,\n    raw_predictions: Output[Artifact],\n    unrelaxed_proteins: Output[Artifact],\n    relaxed_proteins: Output[Artifact],\n):\n  \"\"\"Runs AlphaFold predictions and (optionally) relaxations.\"\"\"\n\n  import json\n  import logging\n  import os\n  import time\n\n  from alphafold_utils import predict_relax as alphafold_predict_relax\n\n  os.makedirs(raw_predictions.path, exist_ok=True)\n  os.makedirs(unrelaxed_proteins.path, exist_ok=True)\n  os.makedirs(relaxed_proteins.path, exist_ok=True)\n\n  logging.info(f'Starting predictions on {prediction_runners} ...')\n  t0 = time.time()\n\n  ranking_confidences = alphafold_predict_relax(\n      model_features_path=model_features.path,\n      model_params_path=model_params.path,\n      prediction_runners=prediction_runners,\n      num_ensemble=num_ensemble,\n      run_multimer_system=run_multimer_system,\n      run_relax=run_relax,\n      raw_prediction_path=raw_predictions.path,\n      unrelaxed_protein_path=unrelaxed_proteins.path,\n      relaxed_protein_path=relaxed_proteins.path,\n  )\n\n  raw_predictions.metadata['category'] = 'raw_predictions'\n  raw_predictions.metadata['ranking_confidences'] = json.dumps(ranking_confidences)\n  unrelaxed_proteins.metadata['category'] = 'unrelaxed_proteins'\n  relaxed_proteins.metadata['category'] = 'relaxed_proteins'\n\n  t1 = time.time()\n  logging.info(f'Model predictions completed. Elapsed time: {t1-t0}')\n\n"
             ],
             "env": [
               {
@@ -576,48 +344,10 @@
             "resources": {
               "accelerator": {
                 "count": "1",
-                "type": "NVIDIA_TESLA_T4"
+                "type": "NVIDIA_TESLA_A100"
               },
-              "cpuLimit": 8.0,
-              "memoryLimit": 3.2e-08
-            }
-          }
-        },
-        "exec-relax": {
-          "container": {
-            "args": [
-              "--executor_input",
-              "{{$}}",
-              "--function_to_execute",
-              "relax"
-            ],
-            "command": [
-              "sh",
-              "-c",
-              "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'kfp==1.8.13' && \"$0\" \"$@\"\n",
-              "sh",
-              "-ec",
-              "program_path=$(mktemp -d)\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\npython3 -m kfp.v2.components.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
-              "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing import *\n\ndef relax(\n    unrelaxed_protein: Input[Artifact],\n    relaxed_protein: Output[Artifact],\n    max_iterations: int = 0,\n    tolerance: float = 2.39,\n    stiffness: float = 10.0,\n    exclude_residues: List[str] = [],\n    max_outer_iterations: int = 3,\n    use_gpu: bool = True\n):\n  \"\"\"Configures and runs Amber relaxation.\"\"\"\n\n  import logging\n  import time\n\n  from alphafold_utils import relax_protein\n\n  t0 = time.time()\n  logging.info('Starting model relaxation ...')\n\n  relaxed_protein.uri = f'{relaxed_protein.uri}.pdb'\n  relaxed_protein_pdb = relax_protein(\n      unrelaxed_protein_path=unrelaxed_protein.path,\n      relaxed_protein_path=relaxed_protein.path,\n      max_iterations=max_iterations,\n      tolerance=tolerance,\n      stiffness=stiffness,\n      exclude_residues=exclude_residues,\n      max_outer_iterations=max_outer_iterations,\n      use_gpu=use_gpu\n  )\n\n  relaxed_protein.metadata['category'] = 'relaxed_protein'\n\n  t1 = time.time()\n  logging.info(f'Model relaxation completed. Elapsed time: {t1-t0}')\n\n"
-            ],
-            "env": [
-              {
-                "name": "TF_FORCE_UNIFIED_MEMORY",
-                "value": "1"
-              },
-              {
-                "name": "XLA_PYTHON_CLIENT_MEM_FRACTION",
-                "value": "4.0"
-              }
-            ],
-            "image": "gcr.io/jk-mlops-dev/alphafold-components",
-            "resources": {
-              "accelerator": {
-                "count": "1",
-                "type": "NVIDIA_TESLA_T4"
-              },
-              "cpuLimit": 8.0,
-              "memoryLimit": 3.2e-08
+              "cpuLimit": 12.0,
+              "memoryLimit": 8.5e-08
             }
           }
         }
@@ -724,7 +454,7 @@
                 "network": {
                   "runtimeValue": {
                     "constantValue": {
-                      "stringValue": "projects/jk-mlops-dev/global/networks/jk-af-dev-network"
+                      "stringValue": "projects/895222332033/global/networks/jk-af-dev-network"
                     }
                   }
                 },
@@ -788,64 +518,6 @@
               "name": "Prepare Features"
             }
           },
-          "for-loop-1": {
-            "componentRef": {
-              "name": "comp-for-loop-1"
-            },
-            "dependentTasks": [
-              "configure-run",
-              "data-pipeline",
-              "importer"
-            ],
-            "inputs": {
-              "artifacts": {
-                "pipelineparam--data-pipeline-features": {
-                  "taskOutputArtifact": {
-                    "outputArtifactKey": "features",
-                    "producerTask": "data-pipeline"
-                  }
-                },
-                "pipelineparam--importer-artifact": {
-                  "taskOutputArtifact": {
-                    "outputArtifactKey": "artifact",
-                    "producerTask": "importer"
-                  }
-                }
-              },
-              "parameters": {
-                "pipelineparam--configure-run-model_runners": {
-                  "taskOutputParameter": {
-                    "outputParameterKey": "model_runners",
-                    "producerTask": "configure-run"
-                  }
-                },
-                "pipelineparam--configure-run-num_ensemble": {
-                  "taskOutputParameter": {
-                    "outputParameterKey": "num_ensemble",
-                    "producerTask": "configure-run"
-                  }
-                },
-                "pipelineparam--configure-run-run_multimer_system": {
-                  "taskOutputParameter": {
-                    "outputParameterKey": "run_multimer_system",
-                    "producerTask": "configure-run"
-                  }
-                },
-                "pipelineparam--is_run_relax": {
-                  "componentInputParameter": "is_run_relax"
-                }
-              }
-            },
-            "parameterIterator": {
-              "itemInput": "pipelineparam--configure-run-model_runners-loop-item",
-              "items": {
-                "inputParameter": "pipelineparam--configure-run-model_runners"
-              }
-            },
-            "taskInfo": {
-              "name": "for-loop-1"
-            }
-          },
           "importer": {
             "cachingOptions": {
               "enableCache": true
@@ -889,6 +561,61 @@
             "taskInfo": {
               "name": "Reference databases"
             }
+          },
+          "predict-relax": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-predict-relax"
+            },
+            "dependentTasks": [
+              "configure-run",
+              "data-pipeline",
+              "importer"
+            ],
+            "inputs": {
+              "artifacts": {
+                "model_features": {
+                  "taskOutputArtifact": {
+                    "outputArtifactKey": "features",
+                    "producerTask": "data-pipeline"
+                  }
+                },
+                "model_params": {
+                  "taskOutputArtifact": {
+                    "outputArtifactKey": "artifact",
+                    "producerTask": "importer"
+                  }
+                }
+              },
+              "parameters": {
+                "num_ensemble": {
+                  "taskOutputParameter": {
+                    "outputParameterKey": "num_ensemble",
+                    "producerTask": "configure-run"
+                  }
+                },
+                "prediction_runners": {
+                  "taskOutputParameter": {
+                    "outputParameterKey": "model_runners",
+                    "producerTask": "configure-run"
+                  }
+                },
+                "run_multimer_system": {
+                  "taskOutputParameter": {
+                    "outputParameterKey": "run_multimer_system",
+                    "producerTask": "configure-run"
+                  }
+                },
+                "run_relax": {
+                  "componentInputParameter": "is_run_relax"
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "Predict/Relax"
+            }
           }
         }
       },
@@ -927,7 +654,7 @@
   "runtimeConfig": {
     "parameters": {
       "is_run_relax": {
-        "stringValue": "relax"
+        "stringValue": "True"
       },
       "model_preset": {
         "stringValue": "monomer"
