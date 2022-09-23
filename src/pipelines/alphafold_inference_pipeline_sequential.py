@@ -35,9 +35,9 @@ DataPipelineOp = create_custom_training_job_from_component(
 
 @dsl.pipeline(
     name='alphafold-inference-pipeline',
-    description='AlphaFold inference using original data pipeline.'
+    description='AlphaFold inference using original data pipeline and sequential prediction and relaxation.'
 )
-def inference_pipeline(
+def alphafold_inference_pipeline_seq(
     sequence_path: str,
     project: str,
     region: str,

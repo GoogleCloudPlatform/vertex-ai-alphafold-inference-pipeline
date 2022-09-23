@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Compiles a KFP v2 pipeline."""
+"""A utility to compile AlphaFold inference pipelines."""
 
 import importlib
 import os
@@ -29,21 +29,30 @@ from google.cloud import resourcemanager_v3
 from kfp.v2 import compiler
 
 
-flags.DEFINE_string('project', 'jk-mlops-dev', 'GCP Project')
-flags.DEFINE_string('project_number',None , 'Project number')
-flags.DEFINE_string('filestore_instance_id', 'jk-af-dev-fs', 'Filestore instance ID')
-flags.DEFINE_string('filestore_instance_location', 'us-central1-a', 'Filestore instance location')
-flags.DEFINE_string('filestore_share', '/datasets', 'Filestore share')
-flags.DEFINE_string('pipeline_package_path', None, 'A path to the output JSON file for the pipeline IR')
+flags.DEFINE_string('project_id', None, 'GCP project')
+flags.DEFINE_string('filestore_instance_id', None, 'Filestore instance ID')
+flags.DEFINE_string('filestore_instance_location',
+                    None, 'Filestore instance location')
+flags.DEFINE_string('filestore_share', None, 'Filestore share')
+flags.DEFINE_string('pipeline_template_path', None,
+                    'Path to the output JSON template')
 flags.DEFINE_string('pipeline_fun', None, 'Pipeline function name')
-flags.DEFINE_string('alphafold_components_image', 'gcr.io/jk-mlops-dev/alphafold-components', 'AlphaFold components container image')
-flags.DEFINE_string('model_params_path', 'gs://jk-af-dev-bucket', 'A path to AlphaFold params')
-flags.DEFINE_string('predict_gpu', 'nvidia-tesla-t4', 'GPU type for prediction')
-flags.DEFINE_string('relax_gpu', 'nvidia-tesla-t4', 'GPU type for relaxation')
-
-flags.mark_flag_as_required('pipeline_package_path')
+flags.DEFINE_string('alphafold_components_image', None,
+                    'AlphaFold components container image')
+flags.DEFINE_string('model_params_path', None, 'GCS path to AlphaFold params')
+flags.DEFINE_enum('predict_gpu', 'nvidia-tesla-t4', ['nvidia-tesla-t4', 'nvidia-tesla-a100'],
+                  'GPU type for prediction')
+flags.DEFINE_enum('relax_gpu', 'nvidia-tesla-t4', ['nvidia-tesla-t4', 'nvidia-tesla-a100'],
+                    'GPU type for relaxation')
+flags.DEFINE_string('data_pipeline_machine_type', 'c2-standard-16',
+                    'Machine type to run the data pipeline on')
+flags.mark_flag_as_required('project_id')
+flags.mark_flag_as_required('filestore_instance_id')
+flags.mark_flag_as_required('filestore_instance_location')
+flags.mark_flag_as_required('filestore_share')
+flags.mark_flag_as_required('pipeline_template_path')
 flags.mark_flag_as_required('pipeline_fun')
-
+flags.mark_flag_as_required('model_params_path')
 FLAGS = flags.FLAGS
 
 
@@ -54,6 +63,7 @@ def _get_fun_by_name(fun_string: str):
 
     return func, fun_name
 
+
 def _get_filestore_info(project_id: str, instance_id: str, location: str):
     client = resourcemanager_v3.ProjectsClient()
     response = client.get_project(name=f'projects/{project_id}')
@@ -62,22 +72,24 @@ def _get_filestore_info(project_id: str, instance_id: str, location: str):
     client = filestore_v1.CloudFilestoreManagerClient()
     instance_name = f'projects/{project_id}/locations/{location}/instances/{instance_id}'
     response = client.get_instance(name=instance_name)
-    network = response.networks[0].network 
+    network = response.networks[0].network
     network = network.replace(project_id, project_number, 1)
 
-    return response.networks[0].ip_addresses[0], network 
+    return response.networks[0].ip_addresses[0], network
+
 
 def _main(argv):
 
-    ip_address, network = _get_filestore_info(FLAGS.project, 
-                                              FLAGS.filestore_instance_id, 
+    ip_address, network = _get_filestore_info(FLAGS.project_id,
+                                              FLAGS.filestore_instance_id,
                                               FLAGS.filestore_instance_location)
 
     os.environ['ALPHAFOLD_COMPONENTS_IMAGE'] = FLAGS.alphafold_components_image
     os.environ['NFS_SERVER'] = ip_address
     os.environ['NFS_PATH'] = FLAGS.filestore_share
-    os.environ['NETWORK'] = network 
+    os.environ['NETWORK'] = network
     os.environ['MODEL_PARAMS_GCS_LOCATION'] = FLAGS.model_params_path
+    os.environ['DATA_PIPELINE_MACHINE_TYPE'] = FLAGS.data_pipeline_machine_type
 
     if FLAGS.predict_gpu == 'nvidia-tesla-a100':
         os.environ['MEMORY_LIMIT'] = '85'
@@ -91,12 +103,11 @@ def _main(argv):
         os.environ['RELAX_GPU_LIMIT'] = '1'
         os.environ['RELAX_GPU_TYPE'] = 'nvidia-tesla-a100'
 
-    pipeline_func, _ = _get_fun_by_name(FLAGS.pipeline_fun) 
+    pipeline_func, _ = _get_fun_by_name(FLAGS.pipeline_fun)
     compiler.Compiler().compile(
         pipeline_func=pipeline_func,
-        package_path=FLAGS.pipeline_package_path
+        package_path=FLAGS.pipeline_template_path
     )
-
 
 
 if __name__ == "__main__":

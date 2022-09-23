@@ -38,38 +38,39 @@ def predict_relax(
     unrelaxed_proteins: Output[Artifact],
     relaxed_proteins: Output[Artifact],
 ):
-  """Runs AlphaFold predictions and (optionally) relaxations."""
- 
-  import json
-  import logging
-  import os
-  import time
+    """Runs AlphaFold predictions and (optionally) relaxations sequentially."""
 
-  from alphafold_utils import predict_relax as alphafold_predict_relax
+    import json
+    import logging
+    import os
+    import time
 
-  os.makedirs(raw_predictions.path, exist_ok=True)
-  os.makedirs(unrelaxed_proteins.path, exist_ok=True)
-  os.makedirs(relaxed_proteins.path, exist_ok=True)
+    from alphafold_utils import predict_relax as alphafold_predict_relax
 
-  logging.info(f'Starting predictions on {prediction_runners} ...')
-  t0 = time.time()
+    os.makedirs(raw_predictions.path, exist_ok=True)
+    os.makedirs(unrelaxed_proteins.path, exist_ok=True)
+    os.makedirs(relaxed_proteins.path, exist_ok=True)
 
-  ranking_confidences = alphafold_predict_relax(
-      model_features_path=model_features.path,
-      model_params_path=model_params.path,
-      prediction_runners=prediction_runners,
-      num_ensemble=num_ensemble,
-      run_multimer_system=run_multimer_system,
-      run_relax=run_relax,
-      raw_prediction_path=raw_predictions.path,
-      unrelaxed_protein_path=unrelaxed_proteins.path,
-      relaxed_protein_path=relaxed_proteins.path,
-  )
+    logging.info(f'Starting predictions on {prediction_runners} ...')
+    t0 = time.time()
 
-  raw_predictions.metadata['category'] = 'raw_predictions'
-  raw_predictions.metadata['ranking_confidences'] = json.dumps(ranking_confidences)
-  unrelaxed_proteins.metadata['category'] = 'unrelaxed_proteins'
-  relaxed_proteins.metadata['category'] = 'relaxed_proteins'
+    ranking_confidences = alphafold_predict_relax(
+        model_features_path=model_features.path,
+        model_params_path=model_params.path,
+        prediction_runners=prediction_runners,
+        num_ensemble=num_ensemble,
+        run_multimer_system=run_multimer_system,
+        run_relax=run_relax,
+        raw_prediction_path=raw_predictions.path,
+        unrelaxed_protein_path=unrelaxed_proteins.path,
+        relaxed_protein_path=relaxed_proteins.path,
+    )
 
-  t1 = time.time()
-  logging.info(f'Model predictions completed. Elapsed time: {t1-t0}')
+    raw_predictions.metadata['category'] = 'raw_predictions'
+    raw_predictions.metadata['ranking_confidences'] = json.dumps(
+        ranking_confidences)
+    unrelaxed_proteins.metadata['category'] = 'unrelaxed_proteins'
+    relaxed_proteins.metadata['category'] = 'relaxed_proteins'
+
+    t1 = time.time()
+    logging.info(f'Model predictions completed. Elapsed time: {t1-t0}')
