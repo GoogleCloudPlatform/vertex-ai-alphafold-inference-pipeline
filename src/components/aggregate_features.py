@@ -33,31 +33,31 @@ def aggregate_features(
     template_features: Input[Artifact],
     features: Output[Artifact],
 ):
-  """Aggregates MSAs and template features to create model features."""
-  import logging
-  import time
-  from alphafold_utils import aggregate
+    """Aggregates MSAs and template features to create model features."""
+    import logging
+    import time
+    from alphafold_utils import aggregate
 
-  logging.info('Starting feature aggregation ...')
-  t0 = time.time()
-  msa_paths = []
-  msa_paths.append((msa1.path, msa1.metadata['data_format']))
-  msa_paths.append((msa2.path, msa2.metadata['data_format']))
-  msa_paths.append((msa3.path, msa3.metadata['data_format']))
-  msa_paths.append((msa4.path, msa4.metadata['data_format']))
-  model_features = aggregate(
-      sequence_path=sequence.path,
-      msa_paths=msa_paths,
-      template_features_path=template_features.path,
-      output_features_path=features.path
-  )
-  features.metadata['category'] = 'features'
-  features.metadata['data_format'] = 'pkl'
-  features.metadata['final_dedup_msa_size'] = int(
-      model_features['num_alignments'][0]
-  )
-  features.metadata['total_num_templates'] = int(
-      model_features['template_domain_names'].shape[0]
-  )
-  t1 = time.time()
-  logging.info(f'Feature aggregation completed. Elapsed time: {t1-t0}')
+    logging.info('Starting feature aggregation ...')
+    t0 = time.time()
+    msa_paths = []
+    msa_paths.append((msa1.path, msa1.metadata['data_format']))
+    msa_paths.append((msa2.path, msa2.metadata['data_format']))
+    msa_paths.append((msa3.path, msa3.metadata['data_format']))
+    msa_paths.append((msa4.path, msa4.metadata['data_format']))
+    model_features = aggregate(
+        sequence_path=sequence.path,
+        msa_paths=msa_paths,
+        template_features_path=template_features.path,
+        output_features_path=features.path
+    )
+    features.metadata['category'] = 'features'
+    features.metadata['data_format'] = 'pkl'
+    features.metadata['final_dedup_msa_size'] = int(
+        model_features['num_alignments'][0]
+    )
+    features.metadata['total_num_templates'] = int(
+        model_features['template_domain_names'].shape[0]
+    )
+    t1 = time.time()
+    logging.info(f'Feature aggregation completed. Elapsed time: {t1-t0}')
