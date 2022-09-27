@@ -22,6 +22,7 @@ from src.components import  data_pipeline
 from src.components import  predict as PredictOp
 from src.components import  relax as RelaxOp
 
+
 DataPipelineOp = create_custom_training_job_from_component(
     data_pipeline,
     display_name='Data Pipeline',
@@ -89,7 +90,10 @@ def alphafold_inference_pipeline(
       use_small_bfd=use_small_bfd,
   ).set_display_name('Prepare Features')
 
-  with dsl.ParallelFor(run_config.outputs['model_runners']) as model_runner:
+  with dsl.ParallelFor(
+        loop_args=run_config.outputs['model_runners'], 
+        parallelism=config.PARALLELISM
+        ) as model_runner:
     model_predict = PredictOp(
         model_features=data_pipeline.outputs['features'],
         model_params=model_parameters.output,
