@@ -57,6 +57,7 @@ FLAGS = flags.FLAGS
 
 
 def _get_fun_by_name(fun_string: str):
+    """Utility to get the function name from str"""
     mod_name, fun_name = fun_string.rsplit('.', 1)
     mod = importlib.import_module(mod_name)
     func = getattr(mod, fun_name)
@@ -64,7 +65,8 @@ def _get_fun_by_name(fun_string: str):
     return func, fun_name
 
 
-def _get_filestore_info(project_id: str, instance_id: str, location: str):
+def get_filestore_info(project_id: str, instance_id: str, location: str):
+    """Returns the IP address and the full network name of a given Filestore"""
     client = resourcemanager_v3.ProjectsClient()
     response = client.get_project(name=f'projects/{project_id}')
     project_number = response.name.split('/')[1]
@@ -79,8 +81,8 @@ def _get_filestore_info(project_id: str, instance_id: str, location: str):
 
 
 def _main(argv):
-
-    ip_address, network = _get_filestore_info(FLAGS.project_id,
+    """Compiles the kubeflow pipeline"""
+    ip_address, network = get_filestore_info(FLAGS.project_id,
                                               FLAGS.filestore_instance_id,
                                               FLAGS.filestore_instance_location)
 
