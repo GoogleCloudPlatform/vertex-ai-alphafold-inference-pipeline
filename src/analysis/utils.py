@@ -21,7 +21,6 @@ import numpy as np
 
 def overwrite_b_factors(pdb_str: str, bfactors: np.ndarray) -> str:
   """Overwrites the B-factors in pdb_str with contents of bfactors array.
-
   Args:
     pdb_str: An input PDB string.
     bfactors: A numpy array with shape [1, n_residues, 37]. We assume that the
@@ -30,7 +29,6 @@ def overwrite_b_factors(pdb_str: str, bfactors: np.ndarray) -> str:
   Returns:
     A new PDB string with the B-factors replaced.
   """
-
   if bfactors.shape[-1] != residue_constants.atom_type_num:
     raise ValueError(
         f'Invalid final dimension size for bfactors: {bfactors.shape[-1]}.')
@@ -50,20 +48,13 @@ def overwrite_b_factors(pdb_str: str, bfactors: np.ndarray) -> str:
                          'B-factors shape: {shape}, idx: {idx}.')
     curr_resid = atom_resid
     atom.bfactor = bfactors[idx, residue_constants.atom_order['CA']]
-
-  new_pdb = io.StringIO()
+  
+  new_pdb = 'to_visualize.pdb'
   pdb_io = PDB.PDBIO()
   pdb_io.set_structure(structure)
   pdb_io.save(new_pdb)
-  return new_pdb.getvalue()
 
-
-def assert_equal_nonterminal_atom_types(
-    atom_mask: np.ndarray, ref_atom_mask: np.ndarray):
-  """Checks that pre- and post-minimized proteins have same atom set."""
-  # Ignore any terminal OXT atoms which may have been added by minimization.
-  oxt = residue_constants.atom_order['OXT']
-  no_oxt_mask = np.ones(shape=atom_mask.shape, dtype=np.bool)
-  no_oxt_mask[..., oxt] = False
-  np.testing.assert_almost_equal(ref_atom_mask[no_oxt_mask],
-                                 atom_mask[no_oxt_mask])
+  with open('to_visualize.pdb') as fp:
+    to_visualize_pdb = fp.read()
+  
+  return to_visualize_pdb
