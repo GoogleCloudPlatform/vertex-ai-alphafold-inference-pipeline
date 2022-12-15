@@ -24,14 +24,15 @@ NETWORK = os.getenv('NETWORK')
 MODEL_PARAMS_GCS_LOCATION = os.getenv('MODEL_PARAMS_GCS_LOCATION')
 
 UNIREF90_PATH = os.getenv('UNIREF90_PATH', 'uniref90/uniref90.fasta')
-MGNIFY_PATH = os.getenv('MGNIFY_PATH', 'mgnify/mgy_clusters_2018_12.fa')
+MGNIFY_PATH = os.getenv('MGNIFY_PATH', 'mgnify/mgy_clusters_2022_05.fa')
 BFD_PATH = os.getenv(
     'BFD_PATH',
     'bfd/bfd_metaclust_clu_complete_id30_c90_final_seq.sorted_opt')
 SMALL_BFD_PATH = os.getenv('SMALL_BFD_PATH',
                            'small_bfd/bfd-first_non_consensus_sequences.fasta')
-UNICLUST30_PATH = os.getenv('UNICLUST30_PATH',
-                            'uniclust30/uniclust30_2018_08/uniclust30_2018_08')
+
+UNIREF30_PATH = os.getenv('UNIREF30_PATH','uniref30/UniRef30_2021_03')
+
 UNIPROT_PATH = os.getenv('UNIPROT_PATH', 'uniprot/uniprot.fasta')
 PDB70_PATH = os.getenv('PDB70_PATH', 'pdb70/pdb70')
 PDB_MMCIF_PATH = os.getenv('PDB_MMCIF_PATH', 'pdb_mmcif/mmcif_files')
