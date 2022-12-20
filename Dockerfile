@@ -17,9 +17,7 @@ FROM nvidia/cuda:${CUDA}-cudnn8-runtime-ubuntu18.04
 # FROM directive resets ARGS, so we specify again (the value is retained if
 # previously set).
 ARG CUDA
-
-# Commenting for now as there is not 2.3.0 release yet.
-# ARG ALPHAFOLD_VERSION=v2.2.4
+ARG ALPHAFOLD_VERSION=v2.3.0
 
 # Use bash to support string substitution.
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -65,7 +63,7 @@ RUN conda install -qy conda==4.13.0 \
       python=3.8 \
       && conda clean --all --force-pkgs-dirs --yes
 
-RUN git clone https://github.com/deepmind/alphafold.git /app/alphafold
+RUN git clone --branch $ALPHAFOLD_VERSION https://github.com/deepmind/alphafold.git /app/alphafold
 RUN wget -q -P /app/alphafold/alphafold/common/ \
   https://git.scicore.unibas.ch/schwede/openstructure/-/raw/7102c63615b64735c4941278d92b554ec94415f8/modules/mol/alg/src/stereo_chemical_props.txt
 
