@@ -48,8 +48,8 @@ def data_pipeline(
       mount_path, ref_databases.metadata['uniref90'])
   mgnify_database_path = os.path.join(
       mount_path, ref_databases.metadata['mgnify'])
-  uniclust30_database_path = os.path.join(
-      mount_path, ref_databases.metadata['uniclust30'])
+  uniref30_database_path = os.path.join(
+      mount_path, ref_databases.metadata['uniref30'])
   bfd_database_path = os.path.join(
       mount_path, ref_databases.metadata['bfd'])
   small_bfd_database_path = os.path.join(
@@ -73,7 +73,7 @@ def data_pipeline(
       mgnify_database_path=mgnify_database_path,
       bfd_database_path=bfd_database_path,
       small_bfd_database_path=small_bfd_database_path,
-      uniclust30_database_path=uniclust30_database_path,
+      uniref30_database_path=uniref30_database_path,
       uniprot_database_path=uniprot_database_path,
       pdb70_database_path=pdb70_database_path,
       obsolete_pdbs_path=obsolete_pdbs_path,

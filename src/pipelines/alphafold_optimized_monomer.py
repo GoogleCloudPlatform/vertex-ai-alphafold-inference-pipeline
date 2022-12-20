@@ -93,7 +93,7 @@ def alphafold_monomer_pipeline(
           'mgnify': config.MGNIFY_PATH,
           'bfd': config.BFD_PATH,
           'small_bfd': config.SMALL_BFD_PATH,
-          'uniclust30': config.UNICLUST30_PATH,
+          'uniref30': config.UNIREF30_PATH,
           'pdb70': config.PDB70_PATH,
           'pdb_mmcif': config.PDB_MMCIF_PATH,
           'pdb_obsolete': config.PDB_OBSOLETE_PATH,
@@ -125,7 +125,7 @@ def alphafold_monomer_pipeline(
   search_uniclust = HHblitsOp(
       project=project,
       location=region,
-      databases=['uniclust30'],
+      databases=['uniref30'],
       ref_databases=reference_databases.output,
       sequence=run_config.outputs['sequence'],
   )
