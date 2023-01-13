@@ -2,7 +2,7 @@
 
 This repository compiles prescriptive guidance and code samples demonstrating how to operationalize AlphaFold batch inference using Vertex AI Pipelines. 
 
-Code sample base on v2.3.0 of AlphaFold.
+Code sample base on v2.3.1 of AlphaFold.
 
 ## Solutions architecture overview
 
