@@ -14,9 +14,9 @@
 
 resource "google_filestore_instance" "filestore_instance" {
   provider = google-beta
-  name = var.filestore_instance_id
+  name     = var.filestore_instance_id
   location = var.zone
-  tier = var.filestore_tier
+  tier     = var.filestore_tier
 
   file_shares {
     capacity_gb = var.share_capacity
@@ -24,13 +24,13 @@ resource "google_filestore_instance" "filestore_instance" {
   }
 
   networks {
-    network           = google_compute_network.network.id
-    modes             = ["MODE_IPV4"]
-    connect_mode      = "PRIVATE_SERVICE_ACCESS"
+    network      = google_compute_network.network.id
+    modes        = ["MODE_IPV4"]
+    connect_mode = "PRIVATE_SERVICE_ACCESS"
   }
 
   depends_on = [
-        google_service_networking_connection.service_connection 
+    google_service_networking_connection.service_connection
   ]
 
 }

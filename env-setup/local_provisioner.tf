@@ -15,8 +15,8 @@
 
 
 resource "null_resource" "copy_datasets" {
-    provisioner "local-exec" {
-        command = <<EOT
+  provisioner "local-exec" {
+    command = <<EOT
 _REGION=${var.region}
 _PROJECT_ID=${data.google_project.project.project_id}
 _PROJECT_NUMBER=${data.google_project.project.number}
@@ -24,7 +24,7 @@ _NETWORK_ID=${google_compute_network.network.id}
 _NETWORK_ID=$(echo $_NETWORK_ID | sed "s#$_PROJECT_ID#$_PROJECT_NUMBER#")
 _FILESTORE_IP=${google_filestore_instance.filestore_instance.networks.0.ip_addresses.0}
 _FILESHARE=${google_filestore_instance.filestore_instance.file_shares.0.name}
-_GCS_PATH=${var.gcs_dbs_path}
+_GCS_PATH=gs://${var.gcs_dbs_path}
 _GCS_PARAMS_PATH=gs://${google_storage_bucket.artifact_repo.name}
 _MOUNT_POINT=/mnt/nfs/alphafold
 
@@ -38,8 +38,8 @@ sed -i s#GCS_PATH#$_GCS_PATH#g vertex-training-template.yaml
 
 gcloud ai custom-jobs create --region $_REGION --display-name populate_filestore --config vertex-training-template.yaml
 EOT
-    }
-    triggers = {
-        always_run = timestamp()
-    }
+  }
+  triggers = {
+    always_run = timestamp()
+  }
 }

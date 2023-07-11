@@ -15,9 +15,9 @@
 
 
 resource "google_storage_bucket" "artifact_repo" {
-    name          = var.gcs_bucket_name
-    location      = var.region
-    storage_class = "REGIONAL"
-    force_destroy = var.force_destroy
-    uniform_bucket_level_access = var.uniform_bucket_access
+  name                        = var.gcs_bucket_name
+  location                    = var.region
+  storage_class               = "REGIONAL"
+  force_destroy               = var.force_destroy
+  uniform_bucket_level_access = var.uniform_bucket_access
 }

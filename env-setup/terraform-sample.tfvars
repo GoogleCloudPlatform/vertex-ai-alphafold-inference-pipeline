@@ -1,3 +1,4 @@
+
 # Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,27 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-locals {
-  image_project = "deeplearning-platform-release"
-}
-
-resource "google_notebooks_instance" "notebook_instance" {
-  name         = var.workbench_instance_name
-  machine_type = var.machine_type
-  location     = var.zone
-
-  network = google_compute_network.network.id
-  subnet  = google_compute_subnetwork.subnetwork.id
-
-  vm_image {
-    project      = local.image_project
-    image_family = var.image_family
-  }
-
-  metadata = {
-    terraform = "true"
-  }
-
-  boot_disk_size_gb   = var.boot_disk_size
-  no_remove_data_disk = true
-}
+project_id              = "<PROJECT_ID>"
+region                  = "<REGION>"
+zone                    = "<ZONE>" ## Zone to create filestore and vertex ai workbench instance
+network_name            = "<NETWORK_NAME>"
+subnet_name             = "<SUBNET_NAME>"
+workbench_instance_name = "<WORKBENCH_INSTANCE_NAME>"
+filestore_instance_id   = "<FILESTORE_INSTANCE_ID>"
+gcs_bucket_name         = "<GCS_BUCKET_NAME>"
+gcs_dbs_path            = "<GCS_DBS_PATH>"

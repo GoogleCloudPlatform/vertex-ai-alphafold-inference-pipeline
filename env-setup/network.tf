@@ -30,7 +30,7 @@ resource "google_compute_global_address" "private_ip_alloc_service_networking" {
   name          = "${var.network_name}-private-ip-alloc"
   purpose       = "VPC_PEERING"
   address_type  = "INTERNAL"
-  address       = split("/", var.peering_ip_range)[0] 
+  address       = split("/", var.peering_ip_range)[0]
   prefix_length = split("/", var.peering_ip_range)[1]
   network       = google_compute_network.network.id
 }
