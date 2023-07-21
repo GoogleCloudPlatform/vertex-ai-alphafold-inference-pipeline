@@ -73,9 +73,9 @@ The below diagram summarizes Google Cloud environment configuration required to 
 
 
 
-## Provisioning a sandbox environment
+## Quick-start Guide
 
-The repo includes an example Terraform configuration that can be used to provision a sandbox environment that complies with the requirements detailed in the previous section. The configuration builds the sandbox environment as follows:
+The repo includes a Terraform configuration that can be used to provision a sandbox environment that complies with the requirements detailed in the previous section. The configuration builds the sandbox environment as follows:
 - Creates a VPC and a subnet to host a Filestore instance and a Vertex Workbench instance
 - Configures VPC Peering between the VPC and the Google services network
 - Creates a Filestore instance
@@ -85,23 +85,23 @@ The repo includes an example Terraform configuration that can be used to provisi
 - Copies the genetic databases from a pre-staging GCS location to the Filestore file share
 - Copies the AlphaFold model parameters from a pre-staging GCS location to the provisioned regional GCS bucket
 
-You need to be a project owner to set up the sandbox environment.
+You need to have "Owner" privileges to set up the sandbox environment.
 
-You will be using [Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-shell) to start and monitor the Terraform setup process. 
+You will be using [Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-shell) to deploy the infrastructure by applying the Terraform configuration. 
 
 ### Step 1 - Select a Google Cloud project and open Cloud Shell
 
-In the Google Cloud Console, navigate to your project and open [Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-shell). ***Make sure you are logged on as the project's owner***.
+In the Google Cloud Console, navigate to your project and open [Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-shell). ***Make sure you have Owner privileges***.
 
 ### Step 2 - Enable the required services
 
 Run the following commands to enable the required services.
 
-```
+```bash
 export PROJECT_ID=<YOUR PROJECT ID>
 ```
 
-```
+```bash
 gcloud config set project $PROJECT_ID
 
 gcloud services enable \
@@ -122,12 +122,12 @@ servicenetworking.googleapis.com
 ```
 
 
-### Step 3 - Run the Terraform configuration
+### Step 3 - Apply the Terraform configuration
 
 
 First, clone the repo.
 
-```
+```bash
 git clone https://github.com/GoogleCloudPlatform/vertex-ai-alphafold-inference-pipeline.git
 cd vertex-ai-alphafold-inference-pipeline/env-setup
 ```
@@ -144,7 +144,7 @@ Set the below environment variables to reflect your environment. The Terraform w
 - `GCS_DBS_PATH` - the path to the GCS location of the genetic databases and model parameters. Terraform will copy the databases replicating a folder structure on GCS. Terrafom will also copy model parameters to the regional bucket. The parameters should be in the `<GCS_DBS_PATH>/params`
 
 
-```
+```bash
 export REGION=<YOUR REGION>
 export ZONE=<YOUR ZONE>
 export NETWORK_NAME=<YOUR NETWORK NAME>
@@ -156,9 +156,9 @@ export GCS_DBS_PATH=<YOUR GCS LOCATION FOR GENETIC DBS>
 ```
 
 
-Start Terraform configuration. This step may take a few minutes so be patient.
+Apply Terraform configuration. This step may take a few minutes so be patient.
 
-```
+```bash
 terraform init
 terraform apply \
 -var=project_id=$PROJECT_ID \
@@ -175,25 +175,13 @@ terraform apply \
 
 In addition to provisioning and configuring the required services, the Terraform configuration starts a Vertex Training job that copies the reference databases from the GCS location to the provisioned Filestore instance. You can monitor the job using the links printed out by Terraform. The job may take a couple of hours to complete.
 
-
-## Configuring Vertex Workbench
-
-In the sandbox environment, an instance of Vertex Workbench is used as a development/experimentation environment to customize, start, and analyze inference pipelines runs. There are a couple of setup steps that are required before you can use example notebooks.
-
-Connect to JupyterLab on your Vertex Workbench instance and start a JupyterLab terminal.
-
-From the JupyterLab terminal:
+**Note that the terraform state is created and stored in your private Cloud Shell disk. It means that only your user is able to maintain the deployed infrastructure via Terraform commands, including destroying this quick-start installation. Don't move or delete the terraform state file, called `env-setup/terraform.tfstate` before reading the official Terraform documentation**
 
 
-### Step 1. Clone the demo repo.
+### Step 4. Build the container image that encapsulates custom KFP components used by the inference pipeline
 
-```
-git clone https://github.com/GoogleCloudPlatform/vertex-ai-alphafold-inference-pipeline.git
-```
 
-### Step 2. Build the container image that encapsulates custom KFP components used by the inference pipelines
-
-```
+```bash
 PROJECT_ID=$(gcloud config list --format 'value(core.project)')
 IMAGE_URI=gcr.io/${PROJECT_ID}/alphafold-components
 
@@ -201,16 +189,31 @@ cd vertex-ai-alphafold-inference-pipeline
 gcloud builds submit --timeout "2h" --tag ${IMAGE_URI} . --machine-type=e2-highcpu-8
 ```
 
-You are now ready to walk through the sample notebooks that demonstrate how to run and customize pipelines. 
 
-**Before walking through the example notebooks make sure that the Vertex Training job that populates the Filestore has completed**
+### Step 5. Preparing Vertex Workbench
+
+In the GCP project, a Vertex Workbench user-managed notebook instance is used as a development/experimentation environment to customize, submit, and analyze inference pipelines runs. There are a couple of setup steps that are required before you can use example notebooks.
+
+Open Vertex AI Workbench, connect to the notebook instance clicking on the "OPEN JUPYTERLAB" link besides the notebook name.
+
+On the JupyterLab interface, launch a new Terminal tab and execute the following command:
+
+```bash
+git clone https://github.com/GoogleCloudPlatform/vertex-ai-alphafold-inference-pipeline.git
+```
+
+### Congratulations!
+
+Now, you're ready to follow the instructions on the notebook "1-alphafold-quick-start.ipynb".
 
 
 ## Clean up
 
-If you want to remove the resource created for the demo execute the following command from Cloud Shell.
+In case you want to destroy all the deployed infrastructure, execute the following command from Cloud Shell. **Note that all infrastructure will be destroyed including any changes you have done in the code inside the Vertex Workbench notebook instance. Make sure you commit all your changes before executing this step.**
 
-```
+Back in the Google Cloud Console, open [Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-shell) and execute the following commands.
+
+```bash
 cd ~/vertex-ai-alphafold-inference-pipeline/env-setup
 
 terraform destroy \

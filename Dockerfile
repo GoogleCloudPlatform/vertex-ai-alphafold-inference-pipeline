@@ -54,7 +54,10 @@ RUN wget -q -P /tmp \
 
 # Install conda packages.
 ENV PATH="/opt/conda/bin:$PATH"
-RUN conda install -qy conda==4.13.0 \
+##  Bug-Fix: Running the conda version 4.13.0, we face an incompatibility issue with python 3.11. 
+##  Issue and fix appled as suggested in this github issue: https://github.com/deepmind/alphafold/issues/798
+#RUN conda install -qy conda==4.13.0 \
+RUN conda install -qy conda==23.1.0 \
     && conda install -y -c conda-forge \
       openmm=7.5.1 \
       cudatoolkit==${CUDA_VERSION} \
