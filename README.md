@@ -209,7 +209,9 @@ Now, you're ready to follow the instructions on the notebook "1-alphafold-quick-
 
 ## Clean up
 
-In case you want to destroy all the deployed infrastructure, execute the following command from Cloud Shell. **Note that all infrastructure will be destroyed including any changes you have done in the code inside the Vertex Workbench notebook instance. Make sure you commit all your changes before executing this step.**
+In case you want to destroy all the deployed infrastructure, follow this instruction. 
+
+**Note that all infrastructure will be destroyed including any changes you have done in the code inside the Vertex Workbench notebook instance. Make sure you commit all your changes before executing this step.**
 
 Back in the Google Cloud Console, open [Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-shell) and execute the following commands.
 
