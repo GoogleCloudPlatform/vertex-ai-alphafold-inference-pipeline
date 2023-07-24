@@ -29,8 +29,8 @@ resource "google_filestore_instance" "filestore_instance" {
     connect_mode = "PRIVATE_SERVICE_ACCESS"
   }
 
-  labels {
-    goog-packaged-solution  =   "target-and-lead-id"    
+  labels = {
+    goog-packaged-solution = "target-and-lead-id"
   }
 
   depends_on = [
