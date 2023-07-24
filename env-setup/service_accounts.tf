@@ -39,6 +39,7 @@ resource "google_project_iam_member" "training_sa_role_bindings" {
   for_each = toset(var.training_sa_roles)
   member   = "serviceAccount:${google_service_account.training_sa.email}"
   role     = "roles/${each.value}"
+
 }
 
 # Create Vertex Pipelines service account

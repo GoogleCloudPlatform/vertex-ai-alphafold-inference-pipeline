@@ -35,4 +35,8 @@ resource "google_notebooks_instance" "notebook_instance" {
 
   boot_disk_size_gb   = var.boot_disk_size
   no_remove_data_disk = true
+
+  labels {
+    goog-packaged-solution  =   "target-and-lead-id"
+  }
 }

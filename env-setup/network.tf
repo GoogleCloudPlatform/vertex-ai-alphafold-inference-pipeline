@@ -33,6 +33,10 @@ resource "google_compute_global_address" "private_ip_alloc_service_networking" {
   address       = split("/", var.peering_ip_range)[0]
   prefix_length = split("/", var.peering_ip_range)[1]
   network       = google_compute_network.network.id
+
+  labels {
+    goog-packaged-solution  =   "target-and-lead-id"
+  }
 }
 
 resource "google_service_networking_connection" "service_connection" {

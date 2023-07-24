@@ -20,4 +20,8 @@ resource "google_storage_bucket" "artifact_repo" {
   storage_class               = "REGIONAL"
   force_destroy               = var.force_destroy
   uniform_bucket_level_access = var.uniform_bucket_access
+  
+  labels {
+    goog-packaged-solution    = "target-and-lead-id"
+  }
 }
