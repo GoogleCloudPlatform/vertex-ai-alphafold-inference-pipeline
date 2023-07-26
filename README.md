@@ -35,7 +35,7 @@ The repository also includes a set of Jupyter notebooks that demonstrate how to 
 
 `env-setup` - Terraform for setting up a sandbox environment
 
-`*.ipynb` - Jupyter notebooks demonstrates how to configure and run the inference pipeline.
+`*.ipynb` - Jupyter notebooks demonstrating how to configure and run the inference pipeline.
 
 
 ## Managing genetic databases
@@ -50,9 +50,12 @@ The repo also includes an [example Terraform configuration](/env-setup) that bui
 
 Follow [the instructions on the AlphaFold repo](https://github.com/deepmind/alphafold#genetic-databases) to download the genetic databases and model parameters. 
 
-**Notes: Once you Make sure to download both the full size and the reduced version of BFD. The total download size for the full databases is around 556 GB and the total size when unzipped is 2.62 TB.**
+**Notes:**
+- Once you Make sure to download both the full size and the reduced version of BFD. 
+- The total download size for the full databases is around 556 GB and the total size when unzipped is 2.62 TB.
 
-These are the minimum commands required:
+These are the current minimum commands required:
+
 ```bash
 sudo apt install aria2
 scripts/download_all_data.sh <DOWNLOAD_DIR>
@@ -107,9 +110,7 @@ Run the following commands to enable the required services.
 
 ```bash
 export PROJECT_ID=<YOUR PROJECT ID>
-```
 
-```bash
 gcloud config set project $PROJECT_ID
 
 gcloud services enable \
@@ -167,7 +168,7 @@ Edit the Terraform variables file. If using Vim:
  vim ${TERRAFORM_RUN_DIR}/terraform.tfvars
 ```
 
-**Note:**
+**Notes:**
 - Terraform will copy the databases replicating a folder structure on GCS. Terrafom will also copy model parameters to the regional bucket. 
 - The parameters should be in the `<GCS_DBS_PATH>/params`
 
@@ -181,7 +182,9 @@ terraform -chdir="${TERRAFORM_RUN_DIR}" apply
 
 In addition to provisioning and configuring the required services, the Terraform configuration starts a Vertex Training job that copies the reference databases from the GCS location to the provisioned Filestore instance. You can monitor the job using the links printed out by Terraform. The job may take a couple of hours to complete.
 
-**Note that the terraform state is created and stored in your private Cloud Shell disk. It means that only your user is able to maintain the deployed infrastructure via Terraform commands, including destroying this quick-start installation. Don't move or delete the terraform state file, called `env-setup/terraform.tfstate` before reading the official Terraform documentation**
+**Notes:** 
+- The terraform state is created and stored in your private Cloud Shell disk. It means that only your user is able to maintain the deployed infrastructure via Terraform commands, including destroying this quick-start installation. 
+- Don't move or delete the terraform state file, called `terraform.tfstate` before reading the official Terraform documentation**
 
 
 ### Step 4. Build the container image that encapsulates custom KFP components used by the inference pipeline
@@ -191,7 +194,7 @@ In addition to provisioning and configuring the required services, the Terraform
 PROJECT_ID=$(gcloud config list --format 'value(core.project)')
 IMAGE_URI=gcr.io/${PROJECT_ID}/alphafold-components
 
-cd vertex-ai-alphafold-inference-pipeline
+cd ${SOURCE_ROOT}
 gcloud builds submit --timeout "2h" --tag ${IMAGE_URI} . --machine-type=e2-highcpu-8
 ```
 
