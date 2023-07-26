@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-network: projects/264747035986/global/networks/alphafold-network
+network: NETWORK_ID
 workerPoolSpecs:
     - machineSpec:
         machineType: n1-standard-16
@@ -23,9 +23,9 @@ workerPoolSpecs:
         - -m 
         - rsync
         - -r
-        - gs://ctimoteo-alphafold-230-dataset
-        - /mnt/nfs/alphafold
+        - GCS_PATH
+        - MOUNT_POINT
       nfsMounts:
-        - server: 10.130.0.2
-          path: /datasets
-          mountPoint: /mnt/nfs/alphafold
+        - server: FILESTORE_IP
+          path: /FILESHARE
+          mountPoint: MOUNT_POINT

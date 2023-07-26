@@ -17,15 +17,15 @@
 resource "null_resource" "copy_datasets" {
 
   triggers = {
-    always_run = timestamp()
-    REGION=var.region
-    PROJECT_ID=data.google_project.project.project_id
-    PROJECT_NUMBER=data.google_project.project.number
-    NETWORK_ID=google_compute_network.network.id
-    FILESTORE_IP=google_filestore_instance.filestore_instance.networks.0.ip_addresses.0
-    FILESHARE=google_filestore_instance.filestore_instance.file_shares.0.name
+    always_run     = timestamp()
+    REGION         = var.region
+    PROJECT_ID     = data.google_project.project.project_id
+    PROJECT_NUMBER = data.google_project.project.number
+    NETWORK_ID     = google_compute_network.network.id
+    FILESTORE_IP   = google_filestore_instance.filestore_instance.networks.0.ip_addresses.0
+    FILESHARE      = google_filestore_instance.filestore_instance.file_shares.0.name
   }
-  
+
   provisioner "local-exec" {
     command = <<EOT
                 NETWORK_ID=$(echo ${self.triggers.NETWORK_ID} | sed "s#${self.triggers.PROJECT_ID}#${self.triggers.PROJECT_NUMBER}#")
@@ -46,10 +46,9 @@ resource "null_resource" "copy_datasets" {
   }
 
   provisioner "local-exec" {
-    when    = destroy
-    command = <<EOT
-                gcloud ai custom-jobs list --project alphafold-dev-392019 --region us-central1 --filter="displayName: populate_filestore AND state: JOB_STATE_PENDING"
-                gcloud ai custom-jobs cancel populate_filestore --region ${self.triggers.REGION}
+    when       = destroy
+    command    = <<EOT
+                gcloud ai custom-jobs cancel $(gcloud ai custom-jobs list --project=${self.triggers.PROJECT_ID} --region=${self.triggers.REGION} --filter="displayName: populate_filestore AND (state: JOB_STATE_PENDING OR state: JOB_STATE_RUNNING)" --limit=1 | grep -e "name" | awk '{ print $2}') --region=${self.triggers.REGION}
                 EOT
     on_failure = continue
   }
