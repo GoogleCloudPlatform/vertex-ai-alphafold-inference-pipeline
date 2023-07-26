@@ -133,52 +133,50 @@ servicenetworking.googleapis.com
 ### Step 3 - Apply the Terraform configuration
 
 
-First, clone the repo.
+First, clone the repo and prepare environment variables.
 
 ```bash
+cd ${HOME}
 git clone https://github.com/GoogleCloudPlatform/vertex-ai-alphafold-inference-pipeline.git
-cd vertex-ai-alphafold-inference-pipeline/env-setup
+
+REPO="vertex-ai-alphafold-inference-pipeline"
+SOURCE_ROOT=${HOME}/${REPO}
+TERRAFORM_RUN_DIR=${SOURCE_ROOT}/env-setup
+cd ${TERRAFORM_RUN_DIR}
 ```
 
-Set the below environment variables to reflect your environment. The Terraform will attempt to create new resources so make sure that the resources with the specified names do not already exist. 
+Create the terraform variables file by making a copy from the template and set the terraform variables that reflect your environment. The sample file has all the required variables listed. The variables are defined as follows.
 
-- `REGION` - your compute region
-- `ZONE` - your compute zone
-- `NETWORK_NAME` - the name for the VPC network
-- `SUBNET_NAME` - the name for the VPC network
-- `WORKBENCH_INSTANCE_NAME` - the name for the Vertex Workbench instance
-- `FILESTORE_INSTANCE_ID` - the instance ID of the Filestore instance. See [Naming your instance](https://cloud.google.com/filestore/docs/creating-instances#naming_your_instance)
-- `GCS_BUCKET_NAME` - the name of the GCS regional bucket. See [Bucket naming guidelines](https://cloud.google.com/storage/docs/naming-buckets) 
-- `GCS_DBS_PATH` - the path to the GCS location of the genetic databases and model parameters. Terraform will copy the databases replicating a folder structure on GCS. Terrafom will also copy model parameters to the regional bucket. The parameters should be in the `<GCS_DBS_PATH>/params`
-
+- `<PROJECT_ID>` - your GCP project id
+- `<REGION>` - your compute region for the Filestore and Vertex Workbench Instance
+- `<ZONE>` - your compute zone
+- `<NETWORK_NAME>` - the name for the VPC network
+- `<SUBNET_NAME>` - the name for the VPC network
+- `<WORKBENCH_INSTANCE_NAME>` - the name for the Vertex Workbench instance
+- `<FILESTORE_INSTANCE_ID>` - the instance ID of the Filestore instance. See [Naming your instance](https://cloud.google.com/filestore/docs/creating-instances#naming_your_instance)
+- `<GCS_BUCKET_NAME>` - the name of the GCS regional bucket. See [Bucket naming guidelines](https://cloud.google.com/storage/docs/naming-buckets) 
+- `<GCS_DBS_PATH>` - the path to the GCS location of the genetic databases and model parameters. 
 
 ```bash
-export REGION=<YOUR REGION>
-export ZONE=<YOUR ZONE>
-export NETWORK_NAME=<YOUR NETWORK NAME>
-export SUBNET_NAME=<YOUR SUBNET NAME>
-export WORKBENCH_INSTANCE_NAME=<YOUR WORKBENCH INSTANCE NAME>
-export FILESTORE_INSTANCE_ID=<YOUR INSTANCE ID>
-export GCS_BUCKET_NAME=<YOUR BUCKET NAME>
-export GCS_DBS_PATH=<YOUR GCS LOCATION FOR GENETIC DBS>
+cp ${TERRAFORM_RUN_DIR}/terraform-sample.tfvars ${TERRAFORM_RUN_DIR}/terraform.tfvars
 ```
+
+Edit the Terraform variables file. If using Vim:
+
+```bash
+ vim ${TERRAFORM_RUN_DIR}/terraform.tfvars
+```
+
+**Note:**
+- Terraform will copy the databases replicating a folder structure on GCS. Terrafom will also copy model parameters to the regional bucket. 
+- The parameters should be in the `<GCS_DBS_PATH>/params`
 
 
 Apply Terraform configuration. This step may take a few minutes so be patient.
 
 ```bash
-terraform init
-terraform apply \
--var=project_id=$PROJECT_ID \
--var=region=$REGION \
--var=zone=$ZONE \
--var=network_name=$NETWORK_NAME \
--var=subnet_name=$SUBNET_NAME \
--var=workbench_instance_name=$WORKBENCH_INSTANCE_NAME \
--var=filestore_instance_id=$FILESTORE_INSTANCE_ID \
--var=gcs_bucket_name=$GCS_BUCKET_NAME \
--var=gcs_dbs_path=$GCS_DBS_PATH
-
+terraform -chdir="${TERRAFORM_RUN_DIR}" init
+terraform -chdir="${TERRAFORM_RUN_DIR}" apply
 ```
 
 In addition to provisioning and configuring the required services, the Terraform configuration starts a Vertex Training job that copies the reference databases from the GCS location to the provisioned Filestore instance. You can monitor the job using the links printed out by Terraform. The job may take a couple of hours to complete.
@@ -224,16 +222,10 @@ In case you want to destroy all the deployed infrastructure, follow this instruc
 Back in the Google Cloud Console, open [Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-shell) and execute the following commands.
 
 ```bash
-cd ~/vertex-ai-alphafold-inference-pipeline/env-setup
+REPO="vertex-ai-alphafold-inference-pipeline"
+SOURCE_ROOT=${HOME}/${REPO}
+TERRAFORM_RUN_DIR=${SOURCE_ROOT}/env-setup
+cd ${TERRAFORM_RUN_DIR}
 
-terraform destroy \
--var=project_id=$PROJECT_ID \
--var=region=$REGION \
--var=zone=$ZONE \
--var=network_name=$NETWORK_NAME \
--var=subnet_name=$SUBNET_NAME \
--var=workbench_instance_name=$WORKBENCH_INSTANCE_NAME \
--var=filestore_instance_id=$FILESTORE_INSTANCE_ID \
--var=gcs_bucket_name=$GCS_BUCKET_NAME \
--var=gcs_dbs_path=$GCS_DBS_PATH
+terraform -chdir="${TERRAFORM_RUN_DIR}" destroy
 ```

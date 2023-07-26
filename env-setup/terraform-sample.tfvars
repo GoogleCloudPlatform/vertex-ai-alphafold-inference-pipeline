@@ -15,7 +15,7 @@
 
 project_id              = "<PROJECT_ID>"
 region                  = "<REGION>"
-zone                    = "<ZONE>" ## Zone to create filestore and vertex ai workbench instance
+zone                    = "<ZONE>"
 network_name            = "<NETWORK_NAME>"
 subnet_name             = "<SUBNET_NAME>"
 workbench_instance_name = "<WORKBENCH_INSTANCE_NAME>"
