@@ -124,7 +124,9 @@ variable "compute_engine_sa_roles" {
   description = "The roles to assign to the Default Compute Engine service acount"
   default = [
     "storage.objectAdmin",
-    "aiplatform.user"
+    "aiplatform.user",
+    "file.editor",
+    "aiplatform.serviceAgent"
   ]
 }
 
