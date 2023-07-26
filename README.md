@@ -35,7 +35,7 @@ The repository also includes a set of Jupyter notebooks that demonstrate how to 
 
 `env-setup` - Terraform for setting up a sandbox environment
 
-Jupyter notebooks are located in the root of the repo.
+`*.ipynb` - Jupyter notebooks demonstrates how to configure and run the inference pipeline.
 
 
 ## Managing genetic databases
@@ -48,8 +48,16 @@ The **Environment requirements** section describes how to configure the GCP envi
 
 The repo also includes an [example Terraform configuration](/env-setup) that builds a sandbox environment meeting the requirements. If you intend to use the provided Terraform configuration you need to pre-stage the genetic databases and model parameters in a Google Cloud Storage bucket. When the Terraform configuration is applied, the databases will be copied from the GCS bucket to the provisioned Filestore instance and the model parameters will be copied to the provisioned regional GCS bucket.
 
-Follow [the instructions on the AlphaFold repo](https://github.com/deepmind/alphafold#genetic-databases) to download the genetic databases and model parameters. Make sure to download both the full size and the reduced version of BFD.
+Follow [the instructions on the AlphaFold repo](https://github.com/deepmind/alphafold#genetic-databases) to download the genetic databases and model parameters. 
 
+**Notes: Once you Make sure to download both the full size and the reduced version of BFD. The total download size for the full databases is around 556 GB and the total size when unzipped is 2.62 TB.**
+
+These are the minimum commands required:
+```bash
+sudo apt install aria2
+scripts/download_all_data.sh <DOWNLOAD_DIR>
+scripts/download_small_bfd.sh <DOWNLOAD_DIR>
+```
 
 ## Environment requirements
 
