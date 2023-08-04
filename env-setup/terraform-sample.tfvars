@@ -1,4 +1,5 @@
-# Copyright 2022 Google LLC
+
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,16 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-
-resource "google_storage_bucket" "artifact_repo" {
-  name                        = var.gcs_bucket_name
-  location                    = var.region
-  storage_class               = "REGIONAL"
-  force_destroy               = var.force_destroy
-  uniform_bucket_level_access = var.uniform_bucket_access
-
-  labels = {
-    goog-packaged-solution = "target-and-lead-id"
-  }
-}
+project_id              = "<PROJECT_ID>"
+region                  = "<REGION>"
+zone                    = "<ZONE>"
+network_name            = "<NETWORK_NAME>"
+subnet_name             = "<SUBNET_NAME>"
+workbench_instance_name = "<WORKBENCH_INSTANCE_NAME>"
+filestore_instance_id   = "<FILESTORE_INSTANCE_ID>"
+gcs_bucket_name         = "<GCS_BUCKET_NAME>"
+gcs_dbs_path            = "<GCS_DBS_PATH>"

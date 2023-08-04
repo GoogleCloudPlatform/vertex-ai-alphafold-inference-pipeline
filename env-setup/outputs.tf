@@ -15,26 +15,26 @@
 
 
 output "filestore_ip" {
-    value = google_filestore_instance.filestore_instance.networks.0.ip_addresses.0
+  value = google_filestore_instance.filestore_instance.networks.0.ip_addresses.0
 }
 
 output "network_id" {
-    value = google_compute_network.network.id
+  value = google_compute_network.network.id
 }
 
 output "fileshare" {
-    value = google_filestore_instance.filestore_instance.file_shares.0.name
+  value = google_filestore_instance.filestore_instance.file_shares.0.name
 }
 
 output "project_id" {
-    value = data.google_project.project.project_id
+  value = data.google_project.project.project_id
 }
 
 output "project_number" {
-    value = data.google_project.project.number
+  value = data.google_project.project.number
 }
 
 output "bucket_name" {
-    value = google_storage_bucket.artifact_repo.name
+  value = google_storage_bucket.artifact_repo.name
 }
 

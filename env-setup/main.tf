@@ -17,14 +17,14 @@ terraform {
   required_providers {
     google = "~> 4.15"
   }
-#    backend "gcs" {
-#    bucket  = "PROJECT_ID-tf-state"
-#    prefix  = "af-demo"
-#  }
+  #    backend "gcs" {
+  #    bucket  = "PROJECT_ID-tf-state"
+  #    prefix  = "af-demo"
+  #  }
 }
 
 provider "google" {
-    project = var.project_id 
+  project = var.project_id
 }
 
 provider "google-beta" {
@@ -32,7 +32,7 @@ provider "google-beta" {
 }
 
 data "google_project" "project" {
-    project_id = var.project_id    
+  project_id = var.project_id
 }
 
 

@@ -13,25 +13,30 @@
 # limitations under the License.
 
 locals {
-    image_project = "deeplearning-platform-release"
+  image_project = "deeplearning-platform-release"
 }
 
 resource "google_notebooks_instance" "notebook_instance" {
-    name             = var.workbench_instance_name
-    machine_type     = var.machine_type
-    location         = var.zone
+  name         = var.workbench_instance_name
+  machine_type = var.machine_type
+  location     = var.zone
 
-    network = google_compute_network.network.id
-    subnet  = google_compute_subnetwork.subnetwork.id
+  network = google_compute_network.network.id
+  subnet  = google_compute_subnetwork.subnetwork.id
 
-    vm_image {
-        project      = local.image_project
-        image_family = var.image_family
-    }
+  vm_image {
+    project      = local.image_project
+    image_family = var.image_family
+  }
 
-    metadata = {
-        terraform = "true"
-    }
+  metadata = {
+    terraform = "true"
+  }
 
-    boot_disk_size_gb   = var.boot_disk_size
+  boot_disk_size_gb   = var.boot_disk_size
+  no_remove_data_disk = true
+
+  labels = {
+    goog-packaged-solution = "target-and-lead-id"
+  }
 }

@@ -1,0 +1,10 @@
+kfp==1.8.22
+kfp-pipeline-spec==0.1.16
+kfp-server-api==1.8.5
+kubernetes==25.3.0
+google-cloud-common==1.2.0
+google-cloud-notebooks==1.7.1
+google-cloud-aiplatform==1.28.1
+google-cloud-pipeline-components==1.0.44
+biopython==1.81
+google-cloud-filestore==1.6.1

@@ -1,3 +1,17 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -103,7 +117,7 @@ celerybeat.pid
 
 # Environments
 .env
-.venv
+.venv/
 env/
 venv/
 ENV/
@@ -128,10 +142,59 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# VSCode config
-.vscode
-.devcontainer
-
-#PyCharm config
+#Pycharm
 .idea
-.DS_store
+
+#npm modules
+node_modules
+
+#compiled pipeline
+*.json
+
+#pytest
+pytest.ini
+
+#Mac DS_Store
+.DS_Store
+
+# Local .terraform directories
+**/.terraform
+
+# Terraform files
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+
+# Cloud Function zip
+terraform/*.zip
+
+# Ignore the user-provided variables file
+**/terraform.tfvars
+
+# env.sh (only example file should be committed)
+env.sh
+
+# VS code configurations
+.vscode
+
+*.lock
+**/tests/artifacts 
+
+*.code-workspace
+
+# Don't store the Terraform backend configuration
+# because it's automatically generated
+**/backend.tf
+
+# Cloud Functions archive file is automatically generated
+**/*.zip
+
+# Ignore the test script file
+**/test.sh
+
+# IntelliJ IDEA files
+*.iml
+.idea
+
+# Kubeflow Pipelines YAML files
+*.yaml
