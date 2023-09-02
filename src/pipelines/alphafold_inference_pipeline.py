@@ -34,6 +34,15 @@ DataPipelineOp = create_custom_training_job_from_component(
     network=config.NETWORK
 )
 
+MyPredictOp = create_custom_training_job_from_component(
+    PredictOp,
+    display_name = 'My Custom Job',
+    machine_type = 'n1-standard-8',
+    accelerator_type='NVIDIA_TESLA_T4',
+#    machine_type = 'g2-standard-8',
+#    accelerator_type='NVIDIA_L4',
+    accelerator_count='1'
+)
 
 @dsl.pipeline(
     name='alphafold-inference-pipeline',
@@ -94,7 +103,9 @@ def alphafold_inference_pipeline(
         loop_args=run_config.outputs['model_runners'], 
         parallelism=config.PARALLELISM
         ) as model_runner:
-    model_predict = PredictOp(
+    model_predict = MyPredictOp(
+        project=project,
+        location=region,
         model_features=data_pipeline.outputs['features'],
         model_params=model_parameters.output,
         model_name=model_runner.model_name,
@@ -103,16 +114,6 @@ def alphafold_inference_pipeline(
         num_ensemble=run_config.outputs['num_ensemble'],
         random_seed=model_runner.random_seed
     ).set_display_name('Predict')
-    model_predict.set_cpu_limit(config.CPU_LIMIT)
-    model_predict.set_memory_limit(config.MEMORY_LIMIT)
-    model_predict.set_gpu_limit(config.GPU_LIMIT)
-    model_predict.add_node_selector_constraint(
-        config.GKE_ACCELERATOR_KEY, config.GPU_TYPE)
-    model_predict.set_env_variable(
-        'TF_FORCE_UNIFIED_MEMORY', config.TF_FORCE_UNIFIED_MEMORY)
-    model_predict.set_env_variable(
-        'XLA_PYTHON_CLIENT_MEM_FRACTION', 
-        config.XLA_PYTHON_CLIENT_MEM_FRACTION)
 
     with dsl.Condition(is_run_relax == 'relax'):
       relax_protein = RelaxOp(

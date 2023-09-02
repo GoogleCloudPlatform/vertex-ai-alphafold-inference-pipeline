@@ -40,8 +40,12 @@ def predict(
 
   import logging
   import time
+  import os
 
   from alphafold_utils import predict as alphafold_predict
+
+  os.environ["TF_FORCE_UNIFIED_MEMORY"] = config.TF_FORCE_UNIFIED_MEMORY
+  os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = config.XLA_PYTHON_CLIENT_MEM_FRACTION
 
   logging.info(f'Starting model prediction {prediction_index} using model {model_name}...')
   t0 = time.time()
