@@ -34,13 +34,19 @@ DataPipelineOp = create_custom_training_job_from_component(
     network=config.NETWORK
 )
 
-MyPredictOp = create_custom_training_job_from_component(
+JobPredictOp = create_custom_training_job_from_component(
     PredictOp,
-    display_name = 'My Custom Job',
-    machine_type = 'n1-standard-8',
-    accelerator_type='NVIDIA_TESLA_T4',
-#    machine_type = 'g2-standard-8',
-#    accelerator_type='NVIDIA_L4',
+    display_name = 'Predict',
+    machine_type = config.PREDICT_MACHINE_TYPE,
+    accelerator_type = config.PREDICT_ACCELERATOR_TYPE,
+    accelerator_count='1'
+)
+
+JobRelaxOp = create_custom_training_job_from_component(
+    RelaxOp,
+    display_name = 'Relax',
+    machine_type = config.RELAX_MACHINE_TYPE,
+    accelerator_type = config.RELAX_ACCELERATOR_TYPE,
     accelerator_count='1'
 )
 
@@ -103,7 +109,7 @@ def alphafold_inference_pipeline(
         loop_args=run_config.outputs['model_runners'], 
         parallelism=config.PARALLELISM
         ) as model_runner:
-    model_predict = MyPredictOp(
+    model_predict = JobPredictOp(
         project=project,
         location=region,
         model_features=data_pipeline.outputs['features'],
@@ -112,21 +118,17 @@ def alphafold_inference_pipeline(
         prediction_index=model_runner.prediction_index,
         run_multimer_system=run_config.outputs['run_multimer_system'],
         num_ensemble=run_config.outputs['num_ensemble'],
-        random_seed=model_runner.random_seed
+        random_seed=model_runner.random_seed,
+        tf_force_unified_memory=config.TF_FORCE_UNIFIED_MEMORY,
+        xla_python_client_mem_fraction=config.XLA_PYTHON_CLIENT_MEM_FRACTION
     ).set_display_name('Predict')
 
     with dsl.Condition(is_run_relax == 'relax'):
-      relax_protein = RelaxOp(
+      relax_protein = JobRelaxOp(
+        project=project,
+        location=region,
         unrelaxed_protein=model_predict.outputs['unrelaxed_protein'],
         use_gpu=True,
+        tf_force_unified_memory=config.TF_FORCE_UNIFIED_MEMORY,
+        xla_python_client_mem_fraction=config.XLA_PYTHON_CLIENT_MEM_FRACTION
       ).set_display_name('Relax protein')
-      relax_protein.set_cpu_limit(config.RELAX_CPU_LIMIT)
-      relax_protein.set_memory_limit(config.RELAX_MEMORY_LIMIT)
-      relax_protein.set_gpu_limit(config.RELAX_GPU_LIMIT)
-      relax_protein.add_node_selector_constraint(
-        config.GKE_ACCELERATOR_KEY, config.RELAX_GPU_TYPE)
-      relax_protein.set_env_variable(
-        'TF_FORCE_UNIFIED_MEMORY', config.TF_FORCE_UNIFIED_MEMORY)
-      relax_protein.set_env_variable(
-        'XLA_PYTHON_CLIENT_MEM_FRACTION', 
-        config.XLA_PYTHON_CLIENT_MEM_FRACTION)

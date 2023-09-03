@@ -33,14 +33,20 @@ def relax(
     stiffness: float = 10.0,
     exclude_residues: List[str] = [],
     max_outer_iterations: int = 3,
-    use_gpu: bool = True
+    use_gpu: bool = True,
+    tf_force_unified_memory: str = '',
+    xla_python_client_mem_fraction: str = ''
 ):
   """Configures and runs Amber relaxation."""
 
   import logging
   import time
+  import os
 
   from alphafold_utils import relax_protein
+
+  os.environ['TF_FORCE_UNIFIED_MEMORY'] = tf_force_unified_memory
+  os.environ['XLA_PYTHON_CLIENT_MEM_FRACTION'] = xla_python_client_mem_fraction
 
   t0 = time.time()
   logging.info('Starting model relaxation ...')

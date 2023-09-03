@@ -33,6 +33,8 @@ def predict(
     num_ensemble: int,
     run_multimer_system: bool,
     random_seed: int,
+    tf_force_unified_memory: str,
+    xla_python_client_mem_fraction: str,
     raw_prediction: Output[Artifact],
     unrelaxed_protein: Output[Artifact]
 ):
@@ -44,8 +46,8 @@ def predict(
 
   from alphafold_utils import predict as alphafold_predict
 
-  os.environ['TF_FORCE_UNIFIED_MEMORY'] = '1'
-  os.environ['XLA_PYTHON_CLIENT_MEM_FRACTION'] = '4.0'
+  os.environ['TF_FORCE_UNIFIED_MEMORY'] = tf_force_unified_memory
+  os.environ['XLA_PYTHON_CLIENT_MEM_FRACTION'] = xla_python_client_mem_fraction
 
   logging.info(f'Starting model prediction {prediction_index} using model {model_name}...')
   t0 = time.time()
