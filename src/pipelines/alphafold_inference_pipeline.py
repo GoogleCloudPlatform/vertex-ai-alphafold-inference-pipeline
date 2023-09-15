@@ -39,7 +39,7 @@ JobPredictOp = create_custom_training_job_from_component(
     display_name = 'Predict',
     machine_type = config.PREDICT_MACHINE_TYPE,
     accelerator_type = config.PREDICT_ACCELERATOR_TYPE,
-    accelerator_count='1'
+    accelerator_count = config.PREDICT_ACCELERATOR_COUNT
 )
 
 JobRelaxOp = create_custom_training_job_from_component(
@@ -47,7 +47,7 @@ JobRelaxOp = create_custom_training_job_from_component(
     display_name = 'Relax',
     machine_type = config.RELAX_MACHINE_TYPE,
     accelerator_type = config.RELAX_ACCELERATOR_TYPE,
-    accelerator_count='1'
+    accelerator_count = config.RELAX_ACCELERATOR_COUNT
 )
 
 @dsl.pipeline(
