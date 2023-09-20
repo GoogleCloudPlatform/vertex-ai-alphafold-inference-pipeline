@@ -33,7 +33,9 @@ def predict_relax(
     prediction_runners: list,
     num_ensemble: int,
     run_multimer_system: bool,
-    run_relax: bool,
+    is_run_relax: str,
+    tf_force_unified_memory: str,
+    xla_python_client_mem_fraction: str,
     raw_predictions: Output[Artifact],
     unrelaxed_proteins: Output[Artifact],
     relaxed_proteins: Output[Artifact],
@@ -51,6 +53,9 @@ def predict_relax(
     os.makedirs(unrelaxed_proteins.path, exist_ok=True)
     os.makedirs(relaxed_proteins.path, exist_ok=True)
 
+    os.environ['TF_FORCE_UNIFIED_MEMORY'] = tf_force_unified_memory
+    os.environ['XLA_PYTHON_CLIENT_MEM_FRACTION'] = xla_python_client_mem_fraction
+
     logging.info(f'Starting predictions on {prediction_runners} ...')
     t0 = time.time()
 
@@ -60,7 +65,7 @@ def predict_relax(
         prediction_runners=prediction_runners,
         num_ensemble=num_ensemble,
         run_multimer_system=run_multimer_system,
-        run_relax=run_relax,
+        run_relax=(is_run_relax == 'relax'),
         raw_prediction_path=raw_predictions.path,
         unrelaxed_protein_path=unrelaxed_proteins.path,
         relaxed_protein_path=relaxed_proteins.path,

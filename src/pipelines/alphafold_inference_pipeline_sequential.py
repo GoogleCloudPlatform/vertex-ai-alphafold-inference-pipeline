@@ -32,6 +32,14 @@ DataPipelineOp = create_custom_training_job_from_component(
     network=config.NETWORK
 )
 
+JobPredictRelaxOp = create_custom_training_job_from_component(
+    PredictRelaxOp,
+    display_name = 'Predict/Relax',
+    machine_type = config.PREDICT_MACHINE_TYPE,
+    accelerator_type = config.PREDICT_ACCELERATOR_TYPE,
+    accelerator_count = config.PREDICT_ACCELERATOR_COUNT
+)
+
 
 @dsl.pipeline(
     name='alphafold-inference-pipeline',
@@ -45,7 +53,7 @@ def alphafold_inference_pipeline_seq(
     model_preset: str = 'monomer',
     use_small_bfd: bool = True,
     num_multimer_predictions_per_model: int = 5,
-    is_run_relax: bool = True,
+    is_run_relax: str = 'relax'
 ):
     """Universal Alphafold Inference Pipeline."""
     run_config = ConfigureRunOp(
@@ -88,21 +96,15 @@ def alphafold_inference_pipeline_seq(
         use_small_bfd=use_small_bfd,
     ).set_display_name('Prepare Features')
 
-    model_predict_relax = PredictRelaxOp(
+    model_predict_relax = JobPredictRelaxOp(
+        project=project,
+        location=region,
         model_features=data_pipeline.outputs['features'],
         model_params=model_parameters.output,
         prediction_runners=run_config.outputs['model_runners'],
         run_multimer_system=run_config.outputs['run_multimer_system'],
         num_ensemble=run_config.outputs['num_ensemble'],
-        run_relax=is_run_relax,
+        is_run_relax=is_run_relax,
+        tf_force_unified_memory=config.TF_FORCE_UNIFIED_MEMORY,
+        xla_python_client_mem_fraction=config.XLA_PYTHON_CLIENT_MEM_FRACTION
     ).set_display_name('Predict/Relax')
-    model_predict_relax.set_cpu_limit(config.CPU_LIMIT)
-    model_predict_relax.set_memory_limit(config.MEMORY_LIMIT)
-    model_predict_relax.set_gpu_limit(config.GPU_LIMIT)
-    model_predict_relax.add_node_selector_constraint(
-        config.GKE_ACCELERATOR_KEY, config.GPU_TYPE)
-    model_predict_relax.set_env_variable(
-        'TF_FORCE_UNIFIED_MEMORY', config.TF_FORCE_UNIFIED_MEMORY)
-    model_predict_relax.set_env_variable(
-        'XLA_PYTHON_CLIENT_MEM_FRACTION',
-        config.XLA_PYTHON_CLIENT_MEM_FRACTION)
