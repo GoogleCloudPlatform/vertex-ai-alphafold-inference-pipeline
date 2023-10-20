@@ -189,6 +189,7 @@ In addition to provisioning and configuring the required services, the Terraform
 
 ### Step 4. Build the container image that encapsulates custom KFP components used by the inference pipeline
 
+In order to make the solution work with new generation GPU of Nvidia L4, we have upgraded CUDA version to 11.8.0 in the Dockerfile. However, it's found such container image will cause Relax step failure in the pipelines. So before a formal fix is provied, please follow the steps below to create two containter images, one for CUDA 11.1.1 and the other for CUDA 11.8.0. When prediting proteins with A100, T4 or V100, use the former while use the latter with L4. 
 
 ```bash
 PROJECT_ID=$(gcloud config list --format 'value(core.project)')
@@ -196,6 +197,11 @@ IMAGE_URI=gcr.io/${PROJECT_ID}/alphafold-components
 
 cd ${SOURCE_ROOT}
 gcloud builds submit --timeout "2h" --tag ${IMAGE_URI} . --machine-type=e2-highcpu-8
+gcloud -q container images add-tag ${IMAGE_URI}:latest ${IMAGE_URI}:cuda-1180
+cp Dockerfile Dockerfile_bak
+cp Dockerfile_cuda1111 Dockerfile
+gcloud builds submit --timeout "2h" --tag ${IMAGE_URI}:cuda-1111 . --machine-type=e2-highcpu-8
+mv Dockerfile_bak Dockerfile
 ```
 
 
