@@ -1,0 +1,9 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'build', 
+          '-t', 
+          '${_CONTAINER_IMAGE_TAG}', 
+          '.' 
+  ]
+images:
+- '${_CONTAINER_IMAGE_TAG}'
