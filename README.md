@@ -110,29 +110,9 @@ Run the following commands to enable the required services.
 
 ```bash
 export PROJECT_ID=<YOUR PROJECT ID>
-
-gcloud config set project $PROJECT_ID
-
-gcloud services enable \
-cloudbuild.googleapis.com \
-compute.googleapis.com \
-cloudresourcemanager.googleapis.com \
-iam.googleapis.com \
-container.googleapis.com \
-cloudtrace.googleapis.com \
-iamcredentials.googleapis.com \
-monitoring.googleapis.com \
-logging.googleapis.com \
-notebooks.googleapis.com \
-aiplatform.googleapis.com \
-file.googleapis.com \
-servicenetworking.googleapis.com
-
 ```
 
-
 ### Step 3 - Apply the Terraform configuration
-
 
 First, clone the repo and prepare environment variables.
 
@@ -149,14 +129,20 @@ cd ${TERRAFORM_RUN_DIR}
 Create the terraform variables file by making a copy from the template and set the terraform variables that reflect your environment. The sample file has all the required variables listed. The variables are defined as follows.
 
 - `<PROJECT_ID>` - your GCP project id
+- `<PROJECT_NUMBER>` - your GCP project number
 - `<REGION>` - your compute region for the Filestore and Vertex Workbench Instance
 - `<ZONE>` - your compute zone
 - `<NETWORK_NAME>` - the name for the VPC network
 - `<SUBNET_NAME>` - the name for the VPC network
-- `<WORKBENCH_INSTANCE_NAME>` - the name for the Vertex Workbench instance
-- `<FILESTORE_INSTANCE_ID>` - the instance ID of the Filestore instance. See [Naming your instance](https://cloud.google.com/filestore/docs/creating-instances#naming_your_instance)
+- `<WORKBENCH_INSTANCE_NAME>` - the name for the Vertex Workbench instance, ex: alpha-wb
+- `<FILESTORE_INSTANCE_ID>` - the instance ID of the Filestore instance. See [Naming your instance](https://cloud.google.com/filestore/docs/creating-instances#naming_your_instance). Example: `alphaf-nfs`
 - `<GCS_BUCKET_NAME>` - the name of the GCS regional bucket. See [Bucket naming guidelines](https://cloud.google.com/storage/docs/naming-buckets) 
 - `<GCS_DBS_PATH>` - the path to the GCS location of the genetic databases and model parameters. 
+- `<ARTIFACT_REGISTRY_REPO_NAME>` - the Artifact Registry repository name to upload pipeline images images. Example: `alphaf-kfp`
+- (Optional) `CLIENT_ID` from OAuth Consent Screen. Populate this value later when doing setup for Alphafold Portal
+- (Optional) `CLIENT_SECRET` from OAuth Consent Screen. Populate this value later when doing setup for Alphafold Portal
+- (Optional) `FLASK_SECRET` by generating random string. See [Generate Random UUID](https://www.uuidgenerator.net/). Populate this value later when doing setup for Alphafold Portal
+- 
 
 ```bash
 cp ${TERRAFORM_RUN_DIR}/terraform-sample.tfvars ${TERRAFORM_RUN_DIR}/terraform.tfvars
@@ -193,7 +179,8 @@ In order to make the solution work with new generation GPU of Nvidia L4, we have
 
 ```bash
 PROJECT_ID=$(gcloud config list --format 'value(core.project)')
-IMAGE_URI=gcr.io/${PROJECT_ID}/alphafold-components
+IMAGE_URI=${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO_NAME}/alphafold-components
+
 
 cd ${SOURCE_ROOT}
 gcloud builds submit --timeout "2h" --tag ${IMAGE_URI} . --machine-type=e2-highcpu-8
@@ -204,8 +191,11 @@ gcloud builds submit --timeout "2h" --tag ${IMAGE_URI}:cuda-1111 . --machine-typ
 mv Dockerfile_bak Dockerfile
 ```
 
+### (Optional) Setup Alphafold Portal
 
-### Step 5. Preparing Vertex Workbench
+Follow the README.md under `~/vertex-ai-alphafold-inference-pipeline/env-setup-portal` directory.
+
+### (Optional) Preparing Vertex Workbench
 
 In the GCP project, a Vertex Workbench user-managed notebook instance is used as a development/experimentation environment to customize, submit, and analyze inference pipelines runs. There are a couple of setup steps that are required before you can use example notebooks.
 

@@ -17,6 +17,7 @@ locals {
 }
 
 resource "google_notebooks_instance" "notebook_instance" {
+  depends_on = [ google_project_service.enable_required_services ]
   name         = var.workbench_instance_name
   machine_type = var.machine_type
   location     = var.zone

@@ -3,7 +3,7 @@
 
    This guide assumes that Artifact Registry repository from the above tutorial has been setup. The location should follow this format:
    
-   ```
+   ```sh
    ${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO_NAME}/alphafold-components
    ```
    
@@ -11,12 +11,17 @@
 ### Create OAuth Consent Screen
    Follow the steps as per https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid to generate a Client ID.
    
-   ```shell
+   ```sh
    CLIENT_ID="<replace_with_generated_client_id>"
    CLIENT_SECRET="<replace_with_generated_client_secret>"
    ```
 
+   > Note: For Authorized Domain section you may leave it empty first until the Cloud Run URL (alphafold_portal_cloud_run_uri, refer below) is generated. Authorized Domain is auto-populated when Authorized Javascript Origin is filled in.
+
 ### Populate terraform.tfvars File Default Values
+
+Copy the .tfvars from env-setup/ folder to env-setup-portal/ folder
+Make sure the copied or the newly generated terraform.tfvars file contains minmimally these variables:
 
 ```
 oauth2_client_id        = "<CLIENT_ID from OAuth Screen Setup>"
@@ -26,7 +31,7 @@ project_id              = "<PROJECT_ID>"
 region                  = "<REGION>"
 zone                    = "<ZONE>"
 filestore_instance_id   = "<FILESTORE_INSTANCE_ID>"
-bucket_name             = "<GCS_BUCKET_NAME>"
+gcs_bucket_name         = "<GCS_BUCKET_NAME>"
 ar_repo_name            = "<ARTIFACT_REGISTRY_REPO_NAME>"
 ```
 
@@ -34,13 +39,13 @@ ar_repo_name            = "<ARTIFACT_REGISTRY_REPO_NAME>"
 
 Assuming the current working directly is at `~/vertex-ai-alphafold-inference-pipeline`
 
-```
+```sh
 cd env-setup-portal
 terraform init
 terraform apply
 ```
 
-### Add the Cloud Run Generated URL into Authorized Domains in OAuth Consent Screen
+### Add the Cloud Run Generated URL into OAuth Consent Screen
 
 Once terraform apply command success, there will be a URL of the cloud run instance that being created:
 
@@ -48,15 +53,23 @@ Once terraform apply command success, there will be a URL of the cloud run insta
 alphafold_portal_cloud_run_uri=https://SOME_URL
 ```
 
-Copy the URL and add the URL into OAuth Consent Screen's Authorized Javascript origins
+Add the Authorized Javascript Origins and Authorized redirect URIs in Client ID Configuration Page:
+S
+```sh
+echo "https://console.cloud.google.com/apis/credentials/oauthclient/${CLIENT_ID}?project=${PROJECT_ID}"
+```
+> Note: Open the link at the output of `echo` command
+
+
+Copy the URL (alphafold_portal_cloud_run_uri's value) and add the URL into OAuth Consent Screen's Authorized Javascript origins
 *and* Authorized redirect URIs section, with additional redirect path: `/api/auth/callback/google`
 
 For example: 
 
-Section Autorized Javascript origins
+Section Authorized Javascript origins
 
 ```
-http://some_url
+http://SOME_URL
 ```
 
 Section Authorized redirect URIs
@@ -65,6 +78,11 @@ Section Authorized redirect URIs
 http://some_url/api/auth/callback/google
 ```
 
+
 ### Accessing Alphafold Portal
 
-Simply access the generated Cloud Run's URL, ex: `https://some_url``
+Simply access the generated Cloud Run's URL, ex: `https://SOME_URL``
+
+### Troubleshooting
+
+Upon login, the address bar might show pop-up being blocked, or error message shown in the page. Please allow pop-up window for the suggested URL and retry.

@@ -27,7 +27,6 @@ const globalContext = createContext<{ accessToken: string | null }>({
   accessToken: null,
 });
 
-
 const BACKEND_HOST = import.meta.env.VITE_BACKEND_HOST ?? "";
 
 function App() {
@@ -74,7 +73,7 @@ function App() {
           </Alert>
         </Snackbar>
         <ResponsiveAppBar
-          toolName={"AlphaFold Runner"}
+          toolName={"AlphaFold Portal"}
           clientId={clientId}
           // onSignIn={(idToken: string, userInfo: string, accessToken: string) => {
           onSignIn={(accessToken: string) => {
@@ -93,6 +92,17 @@ function App() {
           >
             <span>Create Test</span>
           </Button>
+          <Button
+            variant="contained"
+            sx={{
+              marginTop: "20px",
+              marginLeft: "15px",
+              justifyContent: "space-between",
+            }}
+            onClick={() => location.reload()}
+          >
+            <span>Refresh</span>
+          </Button>
           <Drawer
             anchor={"right"}
             open={drawerOpen}
@@ -105,7 +115,6 @@ function App() {
             />
           </Drawer>
         </Box>
-        
       </globalContext.Provider>
     </>
   );

@@ -147,7 +147,7 @@ resource "google_cloud_run_v2_service" "alphafold_portal" {
       }
       env {
         name  = "BUCKET_NAME"
-        value = var.bucket_name
+        value = var.gcs_bucket_name
       }
       env {
         name  = "AR_REPO_NAME"
@@ -164,6 +164,10 @@ resource "google_cloud_run_v2_service" "alphafold_portal" {
       env {
         name  = "PREDICT_MACHINE_TYPE"
         value = var.machine_type
+      }
+      env {
+        name  = "PREDICT_ACCELERATOR_COUNT"
+        value = var.predict_accelerator_count
       }
     }
   }

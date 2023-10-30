@@ -35,7 +35,6 @@ sys.path.append('..')
 from src.utils import fasta_utils
 from src.utils import compile_utils
 
-
 # Basic running parameters
 PROJECT_ID = os.environ.get("PROJECT_ID")  # Change to your project ID
 ZONE = os.environ.get("ZONE")  # Change to your zone (example: us-central1-c)
@@ -230,6 +229,8 @@ def foldtest():
         'region': REGION
         }
 
+        os.environ['PREDICT_MACHINE_TYPE'] = str(form["predictMachineType"]).lower()
+        os.environ['PREDICT_ACCELERATOR_COUNT'] = str(form["acceleratorCount"]).lower()
         os.environ['ALPHAFOLD_COMPONENTS_IMAGE'] = IMAGE_URI
         os.environ['NFS_SERVER'] = FILESTORE_IP
         os.environ['NFS_PATH'] = FILESTORE_SHARE
@@ -274,4 +275,4 @@ def foldtest():
 
 # ======= Server initialization (listening)
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+    app.run(debug=False, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))

@@ -14,17 +14,17 @@
 
 
 variable "oauth2_client_id" {
-  description = "The GCP project ID"
+  description = "CLIENT_ID from OAuth Consent Screen"
   type        = string
 }
 
 variable "oauth2_client_secret" {
-  description = "The GCP project ID"
+  description = "CLIENT_SECRET from OAuth Consent Screen"
   type        = string
 }
 
 variable "flask_secret" {
-  description = "The GCP project ID"
+  description = "Any random string sequence required by Flask backend"
   type        = string
 }
 
@@ -34,39 +34,44 @@ variable "project_id" {
 }
 
 variable "region" {
-  description = "The GCP project ID"
+  description = "The GCP region"
   type        = string
 }
 
 variable "zone" {
-  description = "The GCP project ID"
+  description = "GCP zone"
   type        = string
 }
 
 variable "cloud_run_service_name" {
-  description = "The GCP project ID"
+  description = "The Cloud Run instance name"
   type        = string
   default     = "alphafoldportal"
 }
 
 variable "ar_repo_name" {
-  description = "The GCP project ID"
+  description = "Artifact Registry to store Cloud Run image and AF KFP images"
   type        = string
 }
 
 variable "filestore_instance_id" {
-  description = "The GCP project ID"
+  description = "Filestore ID from Alphafold Inference Pipeline .tfvars file"
   type        = string
 }
 
-variable "bucket_name" {
-  description = "The GCP project ID"
+variable "gcs_bucket_name" {
+  description = "Cloud Storage bucket name"
   type        = string
 }
 
 variable "machine_type" {
   description = "The pipeline instance's machine type"
   type        = string
-  default     = "g2-standard-64"
+  default     = "g2-standard-16"
 }
 
+variable "predict_accelerator_count" {
+  description = "The pipeline's prediction acelerator count"
+  type        = string
+  default     = "1"
+}

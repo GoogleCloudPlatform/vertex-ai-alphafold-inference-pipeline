@@ -29,19 +29,20 @@ import {
   AlertColor,
   TextField,
   Typography,
+  Backdrop,
+  CircularProgress,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
 import axios from "axios";
 import { useState, useContext } from "react";
 import { globalContext } from "./App";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+
 // import { useLocation } from 'react-router-dom';
 
-function NewJob({
-  onClose
-}: {
-  createMode: any;
-  onClose: any;
-  onError: any;
-}) {
+function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
   const errorSeverity: AlertColor = "error";
   const successSeverity: AlertColor = "success";
 
@@ -52,22 +53,29 @@ function NewJob({
   const [proteinType, setProteinType] = useState("");
   const [relaxation, setRelaxation] = useState("");
   const [predictionCount, setPredictionCount] = useState("");
+  const [acceleratorCount, setAcceleratorCount] = useState("");
+  const [predictMachineType, setPredictMachineType] = useState("g2-standard-8");
+
   const [snackbarContent, setSnackbarContent] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>(errorSeverity);
+  const [snackbarSeverity, setSnackbarSeverity] =
+    useState<AlertColor>(errorSeverity);
   const [open, setOpen] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const { accessToken } = useContext(globalContext);
   const BACKEND_HOST = import.meta.env.VITE_BACKEND_HOST ?? "";
 
   const handleFoldRun = () => {
     if (!accessToken) {
-      setSnackbarContent("AccessToken is missing");
+      setSnackbarContent("AccessToken is missing. Please login first.");
       setOpen(true);
       return;
     }
+    setLoading(true);
     if (!file) {
       setSnackbarContent(`FASTA file is missing. Please Upload a FASTA file.`);
       setOpen(true);
+      setLoading(false);
       return;
     }
 
@@ -77,29 +85,61 @@ function NewJob({
     formData.append("relaxation", relaxation);
     formData.append("proteinType", proteinType);
     formData.append("predictionCount", predictionCount);
+    formData.append("acceleratorCount", acceleratorCount);
+    formData.append("predictMachineType", predictMachineType);
     formData.append("file", file);
 
-    return axios.post(`${BACKEND_HOST}/fold`, formData, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "multipart/form-data",
-      },
-    }).then((res) => {
+    return axios
+      .post(`${BACKEND_HOST}/fold`, formData, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => {
         setSnackbarContent(res.data);
         setSnackbarSeverity(successSeverity);
         setOpen(true);
-    });
+        setLoading(false);
+      })
+      .catch((error)=>{
+        setSnackbarContent(error);
+        setSnackbarSeverity(errorSeverity);
+        setOpen(true);
+        setLoading(false);
+      })
   };
 
   const handleCancelJob = () => {
     onClose();
   };
   const handleChange = (event: any, callback: any) => {
+    console.log("textfield fileld", event.target);
     callback(event.target.value);
   };
 
+  const LoadingBackdrop = (
+    <Backdrop
+      sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      open={loading}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <CircularProgress color="inherit" />
+        <span style={{ marginTop: 5 }}>Loading...</span>
+      </div>
+    </Backdrop>
+  );
+
   return (
     <>
+      {LoadingBackdrop}
       {snackbarContent && (
         <Snackbar
           anchorOrigin={{ vertical: "top", horizontal: "right" }}
@@ -170,6 +210,7 @@ function NewJob({
         <span style={{ width: "90%" }}>
           <TextField
             onBlur={(e) => handleChange(e, setExperimentId)}
+            required={true}
             label="Experiment ID"
             variant="outlined"
             sx={{ width: "100%", mt: 2 }}
@@ -182,6 +223,7 @@ function NewJob({
             <InputLabel id="protein-type-select-label">Protein Type</InputLabel>
             <Select
               labelId="protein-type-select-label"
+              required={true}
               id="proteinType"
               value={proteinType}
               label="Protein Type"
@@ -198,6 +240,7 @@ function NewJob({
             <InputLabel id="small-bfd-select-label">Use Small BFD</InputLabel>
             <Select
               labelId="small-bfd-select-label"
+              required={true}
               id="useSmallBfd"
               value={smallBFD}
               label="Use Small BFD"
@@ -211,6 +254,7 @@ function NewJob({
         </span>
         <span style={{ width: "90%" }}>
           <TextField
+            required={true}
             onBlur={(e) => handleChange(e, setPredictionCount)}
             label="Multimer Predictions per model (#)"
             sx={{ width: "100%", mt: 2 }}
@@ -226,6 +270,7 @@ function NewJob({
             </InputLabel>
             <Select
               labelId="relaxation-select-label"
+              required={true}
               id="relaxation"
               value={relaxation}
               label="Run relaxation after folding"
@@ -236,6 +281,48 @@ function NewJob({
               <MenuItem value={"no"}>No</MenuItem>
             </Select>
           </FormControl>
+        </span>
+        <span style={{ width: "90%", marginTop: "25px" }}>
+          <Accordion>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1a-content"
+              id="panel1a-header"
+            >
+              <Typography>Machine Settings</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <FormControl sx={{ mt: 2, minWidth: "100%" }} size="small">
+                <InputLabel id="relaxation-select-label">
+                  Run relaxation after folding
+                </InputLabel>
+                <Select
+                  labelId="relaxation-select-label"
+                  id="relaxation"
+                  required={true}
+                  value={predictMachineType}
+                  label="Run relaxation after folding"
+                  size="small"
+                  onChange={(e) => handleChange(e, setPredictMachineType)}
+                >
+                  <MenuItem value={"g2-standard-8"}>g2-standard-8</MenuItem>
+                  <MenuItem value={"g2-standard-16"}>g2-standard-16</MenuItem>
+                  <MenuItem value={"g2-standard-32"}>g2-standard-32</MenuItem>
+                  <MenuItem value={"g2-standard-48"}>g2-standard-48</MenuItem>
+                </Select>
+              </FormControl>
+              <TextField
+                onBlur={(e) => handleChange(e, setAcceleratorCount)}
+                required={true}
+                label="Accelerator Count"
+                defaultValue={1}
+                sx={{ width: "100%", mt: 2 }}
+                size="small"
+                variant="outlined"
+                helperText="Sample numbers: 1, 4"
+              />
+            </AccordionDetails>
+          </Accordion>
         </span>
         <div style={{ display: "flex", flexDirection: "row" }}>
           <Button

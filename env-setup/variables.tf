@@ -157,3 +157,8 @@ variable "uniform_bucket_access" {
   description = "Uniform bucket access flag"
   default     = true
 }
+
+variable "ar_repo_name" {
+  description = "Artifact Registry repository name to hold pipeline images"
+  type        = string
+}

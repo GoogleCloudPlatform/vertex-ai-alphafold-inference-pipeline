@@ -96,27 +96,29 @@ function GoogleSignInButton({
 
   useEffect(() => {
     if (!window.google) return;
-    window.google.accounts.id.initialize({
-      client_id: clientId,
-      context: "use",
-      auto_select: true,
-      cancel_on_tap_outside: false,
-      prompt_parent_id: googleSignInRef.current,
-      callback: handleSignIn,
-    });
-    window.google.accounts.id.renderButton(
-      googleSignInRef.current,
-      {
-        theme: "outline",
-        type: "standard",
-        text: "signin_with",
-        size: "large",
-        shape: "pill",
-      },
-      null,
-    );
+    // if (!googleSignInRef.current) {
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        context: "use",
+        auto_select: true,
+        cancel_on_tap_outside: false,
+        prompt_parent_id: googleSignInRef.current,
+        callback: handleSignIn,
+      });
+      window.google.accounts.id.renderButton(
+        googleSignInRef.current,
+        {
+          theme: "outline",
+          type: "standard",
+          text: "signin_with",
+          size: "large",
+          shape: "pill",
+        },
+        null,
+      );
 
-    enableOneTap && window.google.accounts.id.prompt();
+      enableOneTap && window.google.accounts.id.prompt();
+    // }
   }, []);
 
   return (
