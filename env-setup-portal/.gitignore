@@ -167,9 +167,6 @@ dmypy.json
 #npm modules
 node_modules
 
-#compiled pipeline
-# *.json
-
 #pytest
 pytest.ini
 
