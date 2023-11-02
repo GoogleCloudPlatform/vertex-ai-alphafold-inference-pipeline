@@ -9,30 +9,54 @@
    
 
 ### Create OAuth Consent Screen
-   Follow the steps as per https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid to generate a Client ID.
+   Follow the steps as per https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid to generate a CLIENT_ID and CLIENT_SECRET. Alternatively follow the following steps:
+
+1. Go to OAuth Consent Screen Page in the browser:
+   ```
+   https://console.cloud.google.com/apis/credentials/consent?referrer=search&project=<YOUR PROJECT_ID>
+   ```
+
+2. Choose Internal for User Type, then click **Create**.
+3. Fill only the mandatory fields, then click **Save and Continue**.
+
+   > Note: For Authorized Domain section you may leave it empty first until the Cloud Run URL (alphafold_portal_cloud_run_uri, refer below) is generated. Authorized Domain is auto-populated when Authorized Javascript Origin is filled in.
+
+4. On Scope page, leave everything as is and click **Save and Continue**.
+5. On Summary page, click **Back to Dashboard**.
+6. Go to Credentials page: https://console.cloud.google.com/apis/credentials?project=<YOUR PROJECT_ID>
+7. Click **Create Credentials**, and choose _OAuth Client ID_
+8. Choose Web Application from **Application Type** dropdown.
+9. Type any name to identify the client, ex: _alpha_portal_client_, then click **Create**
+10. Copy the generated **Client ID** and **Client Secret** and export them as environment variables:
    
    ```sh
    CLIENT_ID="<replace_with_generated_client_id>"
    CLIENT_SECRET="<replace_with_generated_client_secret>"
    ```
+   > Note: Leave Authorized Javascript Origin and Redirect URI section empty for now until the terraform is deployed and `alphafold_portal_cloud_run_uri` (Cloud Run URL) is generated.
 
-   > Note: For Authorized Domain section you may leave it empty first until the Cloud Run URL (alphafold_portal_cloud_run_uri, refer below) is generated. Authorized Domain is auto-populated when Authorized Javascript Origin is filled in.
 
 ### Populate terraform.tfvars File Default Values
 
-Copy the .tfvars from env-setup/ folder to env-setup-portal/ folder
+Assuming the copy of the repo is at `~/vertex-ai-alphafold-inference-pipeline/`, copy the terraform.tfvars from env-setup/ folder to env-setup-portal/ folder:
+
+```
+cp ~/vertex-ai-alphafold-inference-pipeline/env-setup/terraform.tfvars ~/vertex-ai-alphafold-inference-pipeline/env-setup-portal
+cd ~/vertex-ai-alphafold-inference-pipeline/env-setup-portal
+```
+
 Make sure the copied or the newly generated terraform.tfvars file contains minmimally these variables:
 
 ```
-oauth2_client_id        = "<CLIENT_ID from OAuth Screen Setup>"
-oauth2_client_secret    = "<CLIENT_SECRET from OAuth Screen Setup>"
-flask_secret            = "<any random string, use https://www.uuidgenerator.net/guid"
 project_id              = "<PROJECT_ID>"
 region                  = "<REGION>"
 zone                    = "<ZONE>"
 filestore_instance_id   = "<FILESTORE_INSTANCE_ID>"
 gcs_bucket_name         = "<GCS_BUCKET_NAME>"
 ar_repo_name            = "<ARTIFACT_REGISTRY_REPO_NAME>"
+oauth2_client_id        = "<CLIENT_ID from OAuth Screen Setup>"
+oauth2_client_secret    = "<CLIENT_SECRET from OAuth Screen Setup>"
+flask_secret            = "<any random string, use https://www.uuidgenerator.net/guid"
 ```
 
 ### Apply Terraform
@@ -75,7 +99,7 @@ http://SOME_URL
 Section Authorized redirect URIs
 
 ```
-http://some_url/api/auth/callback/google
+http://SOME_URL/api/auth/callback/google
 ```
 
 

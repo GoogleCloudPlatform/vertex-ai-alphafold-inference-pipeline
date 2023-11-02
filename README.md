@@ -104,9 +104,9 @@ You will be using [Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-
 
 In the Google Cloud Console, navigate to your project and open [Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-shell). ***Make sure you have Owner privileges***.
 
-### Step 2 - Enable the required services
+### Step 2 - Setup environment variables
 
-Run the following commands to enable the required services.
+Run the following commands to setup environment variables.
 
 ```bash
 export PROJECT_ID=<YOUR PROJECT ID>
@@ -154,6 +154,23 @@ Edit the Terraform variables file. If using Vim:
  vim ${TERRAFORM_RUN_DIR}/terraform.tfvars
 ```
 
+The following is only a sample values to illustrate .tfvars file actual values, please modify the values accordingly:
+
+```
+project_id              = "my-project-1"
+region                  = "us-central1"
+zone                    = "us-central1-b"
+network_name            = "alphaf-network"
+subnet_name             = "alphaf-subnetwork"
+workbench_instance_name = "alphaf-wb"
+filestore_instance_id   = "alphaf-nfs"
+gcs_bucket_name         = "my-project-1-alphaf-bucket"
+gcs_dbs_path            = "alphafold-uscentral-dbcopy/new/af-dataset"
+ar_repo_name            = "alphaf-kfp"
+```
+
+> Note: gcs_dbs_path shouldn't use `gs://` prefix.
+
 **Notes:**
 - Terraform will copy the databases replicating a folder structure on GCS. Terrafom will also copy model parameters to the regional bucket. 
 - The parameters should be in the `<GCS_DBS_PATH>/params`
@@ -175,7 +192,11 @@ In addition to provisioning and configuring the required services, the Terraform
 
 ### (Optional) Setup Alphafold Portal
 
-Follow the README.md under `~/vertex-ai-alphafold-inference-pipeline/env-setup-portal` directory.
+Follow the README.md under `$SOURCE_ROOT/env-setup-portal` directory, or view the README directly from Github:
+
+```
+https://github.com/GoogleCloudPlatform/vertex-ai-alphafold-inference-pipeline/blob/alphafold-portal/env-setup-portal/README.md
+```
 
 ### (Optional) Preparing Vertex Workbench
 
