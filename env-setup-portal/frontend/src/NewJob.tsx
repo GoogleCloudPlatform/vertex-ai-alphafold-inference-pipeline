@@ -55,6 +55,8 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
   const [predictionCount, setPredictionCount] = useState("");
   const [acceleratorCount, setAcceleratorCount] = useState("");
   const [predictMachineType, setPredictMachineType] = useState("g2-standard-8");
+  const [relaxAcceleratorCount, setRelaxAcceleratorCount] = useState("");
+  const [relaxMachineType, setRelaxMachineType] = useState("g2-standard-12");
 
   const [snackbarContent, setSnackbarContent] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] =
@@ -85,8 +87,13 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
     formData.append("relaxation", relaxation);
     formData.append("proteinType", proteinType);
     formData.append("predictionCount", predictionCount);
+
     formData.append("acceleratorCount", acceleratorCount);
     formData.append("predictMachineType", predictMachineType);
+    
+    formData.append("relaxAcceleratorCount", relaxAcceleratorCount);
+    formData.append("relaxMachineType", relaxMachineType);
+    
     formData.append("file", file);
 
     return axios
@@ -293,12 +300,12 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
             </AccordionSummary>
             <AccordionDetails>
               <FormControl sx={{ mt: 2, minWidth: "100%" }} size="small">
-                <InputLabel id="relaxation-select-label">
-                  Run relaxation after folding
+                <InputLabel id="predict-machine-type-select-label">
+                  Prediction Machine Type
                 </InputLabel>
                 <Select
-                  labelId="relaxation-select-label"
-                  id="relaxation"
+                  labelId="predict-machine-type-select-label"
+                  id="prediction"
                   required={true}
                   value={predictMachineType}
                   label="Run relaxation after folding"
@@ -309,12 +316,53 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
                   <MenuItem value={"g2-standard-16"}>g2-standard-16</MenuItem>
                   <MenuItem value={"g2-standard-32"}>g2-standard-32</MenuItem>
                   <MenuItem value={"g2-standard-48"}>g2-standard-48</MenuItem>
+                  <MenuItem value={"g2-standard-48"}>a2-highgpu-1g</MenuItem>
+                  <MenuItem value={"g2-standard-48"}>a2-highgpu-2g</MenuItem>
+                  <MenuItem value={"g2-standard-48"}>a2-highgpu-3g</MenuItem>
+                  <MenuItem value={"g2-standard-48"}>a2-highgpu-4g</MenuItem>
+                  <MenuItem value={"g2-standard-48"}>a2-highgpu-8g</MenuItem>
+                  <MenuItem value={"g2-standard-48"}>a2-highgpu-16g</MenuItem>
                 </Select>
               </FormControl>
               <TextField
                 onBlur={(e) => handleChange(e, setAcceleratorCount)}
                 required={true}
-                label="Accelerator Count"
+                label="Prediction Accelerator Count"
+                defaultValue={1}
+                sx={{ width: "100%", mt: 2 }}
+                size="small"
+                variant="outlined"
+                helperText="Sample numbers: 1, 4"
+              />
+                <FormControl sx={{ mt: 2, minWidth: "100%" }} size="small">
+                <InputLabel id="relax-machine-type-select-label">
+                  Relaxation Machine Type
+                </InputLabel>
+                <Select
+                  labelId="relax-machine-type-select-label"
+                  id="relaxation"
+                  required={true}
+                  value={relaxMachineType}
+                  label="Run relaxation after folding"
+                  size="small"
+                  onChange={(e) => handleChange(e, setRelaxMachineType)}
+                >
+                  <MenuItem value={"g2-standard-8"}>g2-standard-8</MenuItem>
+                  <MenuItem value={"g2-standard-16"}>g2-standard-16</MenuItem>
+                  <MenuItem value={"g2-standard-32"}>g2-standard-32</MenuItem>
+                  <MenuItem value={"g2-standard-48"}>g2-standard-48</MenuItem>
+                  <MenuItem value={"g2-standard-48"}>a2-highgpu-1g</MenuItem>
+                  <MenuItem value={"g2-standard-48"}>a2-highgpu-2g</MenuItem>
+                  <MenuItem value={"g2-standard-48"}>a2-highgpu-3g</MenuItem>
+                  <MenuItem value={"g2-standard-48"}>a2-highgpu-4g</MenuItem>
+                  <MenuItem value={"g2-standard-48"}>a2-highgpu-8g</MenuItem>
+                  <MenuItem value={"g2-standard-48"}>a2-highgpu-16g</MenuItem>
+                </Select>
+              </FormControl>
+              <TextField
+                onBlur={(e) => handleChange(e, setRelaxAcceleratorCount)}
+                required={true}
+                label="Relaxation Accelerator Count"
                 defaultValue={1}
                 sx={{ width: "100%", mt: 2 }}
                 size="small"

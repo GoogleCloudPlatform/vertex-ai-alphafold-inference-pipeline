@@ -90,7 +90,7 @@ function App() {
             sx={{ marginTop: "20px", justifyContent: "space-between" }}
             onClick={handleCreateTestClick}
           >
-            <span>Create Test</span>
+            <span>New Protein Folding</span>
           </Button>
           <Button
             variant="contained"

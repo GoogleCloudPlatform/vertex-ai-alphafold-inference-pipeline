@@ -180,6 +180,14 @@ def valid_user():
     if datetime.now().timestamp() > float(user_info['exp']): return False
     return user_info
 
+def decide_accelerator_type(machine_type):
+    if machine_type.startswith("a"):
+        return "NVIDIA_TESLA_A100"
+    elif machine_type.startswith("g"):
+        return "NVIDIA_L4"
+    else:
+        return "NVIDIA_L4"
+
 @app.route("/fold",methods=['POST'])
 def foldtest():
     user_info = valid_user()
@@ -231,6 +239,12 @@ def foldtest():
 
         os.environ['PREDICT_MACHINE_TYPE'] = str(form["predictMachineType"]).lower()
         os.environ['PREDICT_ACCELERATOR_COUNT'] = str(form["acceleratorCount"]).lower()
+        os.environ['PREDICT_ACCELERATOR_TYPE'] = decide_accelerator_type(str(form["predictMachineType"]))
+        
+        os.environ['RELAX_MACHINE_TYPE'] = str(form["relaxMachineType"]).lower()
+        os.environ['RELAX_ACCELERATOR_COUNT'] = str(form["relaxAcceleratorCount"]).lower()
+        os.environ['RELAX_ACCELERATOR_TYPE'] = decide_accelerator_type(str(form["relaxMachineType"]))
+
         os.environ['ALPHAFOLD_COMPONENTS_IMAGE'] = IMAGE_URI
         os.environ['NFS_SERVER'] = FILESTORE_IP
         os.environ['NFS_PATH'] = FILESTORE_SHARE
