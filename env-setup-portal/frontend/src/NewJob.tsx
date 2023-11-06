@@ -53,10 +53,10 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
   const [proteinType, setProteinType] = useState("");
   const [relaxation, setRelaxation] = useState("");
   const [predictionCount, setPredictionCount] = useState("");
-  const [acceleratorCount, setAcceleratorCount] = useState("");
+  const [acceleratorCount, setAcceleratorCount] = useState("1");
   const [predictMachineType, setPredictMachineType] = useState("g2-standard-8");
-  const [relaxAcceleratorCount, setRelaxAcceleratorCount] = useState("");
-  const [relaxMachineType, setRelaxMachineType] = useState("g2-standard-12");
+  const [relaxAcceleratorCount, setRelaxAcceleratorCount] = useState("1");
+  const [relaxMachineType, setRelaxMachineType] = useState("g2-standard-8");
 
   const [snackbarContent, setSnackbarContent] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] =
@@ -92,6 +92,7 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
     formData.append("predictMachineType", predictMachineType);
     
     formData.append("relaxAcceleratorCount", relaxAcceleratorCount);
+
     formData.append("relaxMachineType", relaxMachineType);
     
     formData.append("file", file);
@@ -121,7 +122,6 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
     onClose();
   };
   const handleChange = (event: any, callback: any) => {
-    console.log("textfield fileld", event.target);
     callback(event.target.value);
   };
 
@@ -351,12 +351,12 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
                   <MenuItem value={"g2-standard-16"}>g2-standard-16</MenuItem>
                   <MenuItem value={"g2-standard-32"}>g2-standard-32</MenuItem>
                   <MenuItem value={"g2-standard-48"}>g2-standard-48</MenuItem>
-                  <MenuItem value={"g2-standard-48"}>a2-highgpu-1g</MenuItem>
-                  <MenuItem value={"g2-standard-48"}>a2-highgpu-2g</MenuItem>
-                  <MenuItem value={"g2-standard-48"}>a2-highgpu-3g</MenuItem>
-                  <MenuItem value={"g2-standard-48"}>a2-highgpu-4g</MenuItem>
-                  <MenuItem value={"g2-standard-48"}>a2-highgpu-8g</MenuItem>
-                  <MenuItem value={"g2-standard-48"}>a2-highgpu-16g</MenuItem>
+                  <MenuItem value={"a2-highgpu-1g"}>a2-highgpu-1g</MenuItem>
+                  <MenuItem value={"a2-highgpu-2g"}>a2-highgpu-2g</MenuItem>
+                  <MenuItem value={"a2-highgpu-3g"}>a2-highgpu-3g</MenuItem>
+                  <MenuItem value={"a2-highgpu-4g"}>a2-highgpu-4g</MenuItem>
+                  <MenuItem value={"a2-highgpu-8g"}>a2-highgpu-8g</MenuItem>
+                  <MenuItem value={"a2-highgpu-16g"}>a2-highgpu-16g</MenuItem>
                 </Select>
               </FormControl>
               <TextField
