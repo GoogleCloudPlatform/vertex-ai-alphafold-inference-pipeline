@@ -19,7 +19,7 @@
 import { useState, createContext, useEffect } from "react";
 import Snackbar from "@mui/material/Snackbar";
 import { ResponsiveAppBar } from "./components/ResponsiveAppBar";
-import { Alert, Box, Button, Drawer } from "@mui/material";
+import { Alert, AlertColor, Box, Button, Drawer } from "@mui/material";
 import { NewJob } from "./NewJob";
 import JobResults from "./JobResults";
 import axios from "axios";
@@ -30,11 +30,13 @@ const globalContext = createContext<{ accessToken: string | null }>({
 const BACKEND_HOST = import.meta.env.VITE_BACKEND_HOST ?? "";
 
 function App() {
-  const [showError, setShowError] = useState(false);
-  const [errorContent, setErrorContent] = useState("");
+  const [showNotification, setShowNotification] = useState(false);
+  const [notifContent, setNotifContent] = useState("");
+  const [nofifType, setNotifType] = useState<AlertColor>("error");
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [clientId, setClientId] = useState("");
+  const [jobsRefresh, setJobsRefresh] = useState(false);
 
   useEffect(() => {
     const fetchClientId = async () => {
@@ -44,9 +46,10 @@ function App() {
     fetchClientId();
   }, []);
 
-  function showSnackbar(errorMessage: string) {
-    setErrorContent(errorMessage);
-    setShowError(true);
+  function showSnackbar(message: string, notificationType: AlertColor) {
+    setNotifContent(message);
+    setNotifType(notificationType);
+    setShowNotification(true);
   }
 
   const handleCreateTestClick = () => {
@@ -57,19 +60,19 @@ function App() {
     <>
       <globalContext.Provider value={{ accessToken: accessToken }}>
         <Snackbar
-          open={showError}
+          open={showNotification}
           autoHideDuration={6000}
           anchorOrigin={{ vertical: "top", horizontal: "right" }}
-          onClose={() => setShowError(false)}
+          onClose={() => setShowNotification(false)}
         >
           <Alert
             onClose={() => {
-              setShowError(false);
+              setShowNotification(false);
             }}
-            severity={"error"}
+            severity={nofifType}
             sx={{ width: "100%" }}
           >
-            {errorContent}
+            {notifContent}
           </Alert>
         </Snackbar>
         <ResponsiveAppBar
@@ -79,11 +82,11 @@ function App() {
           onSignIn={(accessToken: string) => {
             setAccessToken(accessToken);
           }}
-          onError={(err: any) => showSnackbar(JSON.stringify(err))}
+          onError={(err: any) => showSnackbar(JSON.stringify(err), "error")}
         />
         <Box sx={{ margin: "20px" }}>
           <h2>Dashboard</h2>
-          <JobResults />
+          <JobResults refresh={jobsRefresh} />
 
           <Button
             variant="contained"
@@ -106,12 +109,20 @@ function App() {
           <Drawer
             anchor={"right"}
             open={drawerOpen}
+            variant="persistent"
             onClose={() => setDrawerOpen(false)}
           >
             <NewJob
               createMode={true}
-              onClose={() => setDrawerOpen(false)}
-              onError={setShowError}
+              onClose={(refresh: boolean) => {
+                setDrawerOpen(false);
+                if(refresh){
+                  setJobsRefresh(!jobsRefresh);
+                  showSnackbar("Folding is in progress...", "success");
+                }
+                window.scrollTo(0,0);
+              }}
+              onError={setShowNotification}
             />
           </Drawer>
         </Box>

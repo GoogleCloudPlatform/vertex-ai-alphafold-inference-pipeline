@@ -289,7 +289,7 @@ def foldtest():
         # Log folding job
         message = f"Folding started for experiment ID {experiment_id} with parameters {params}"
         print(f'/fold MESAGE {message}')
-        return Response("{ status: 'job submitted' }", 
+        return Response("status: folding is in progress... }", 
                         status=200,mimetype='application/json') 
     else:
         return Response("{'status':'Unauthorized'}", status=401, mimetype='application/json')

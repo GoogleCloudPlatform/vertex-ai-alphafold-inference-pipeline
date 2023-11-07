@@ -11,7 +11,7 @@ import { useEffect, useState, useContext } from "react";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const BACKEND_HOST = import.meta.env.VITE_BACKEND_HOST ?? "";
 
-export default function JobResults() {
+export default function JobResults(props: any) {
   const [rows, setRows] = useState([]);
   const { accessToken } = useContext(globalContext);
 
@@ -26,7 +26,7 @@ export default function JobResults() {
       setRows(jobs.data);
     };
     fetchJobs();
-  }, [accessToken]);
+  }, [accessToken, props.refresh]);
 
   return (
     <TableContainer component={Paper}>
