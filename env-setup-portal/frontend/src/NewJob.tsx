@@ -39,6 +39,7 @@ import axios from "axios";
 import { useState, useContext } from "react";
 import { globalContext } from "./App";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { calculateAcceleratorCount } from "./common/CommonFunctions";
 
 // import { useLocation } from 'react-router-dom';
 
@@ -53,9 +54,7 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
   const [proteinType, setProteinType] = useState("");
   const [relaxation, setRelaxation] = useState("");
   const [predictionCount, setPredictionCount] = useState("");
-  const [acceleratorCount, setAcceleratorCount] = useState("1");
   const [predictMachineType, setPredictMachineType] = useState("g2-standard-8");
-  const [relaxAcceleratorCount, setRelaxAcceleratorCount] = useState("1");
   const [relaxMachineType, setRelaxMachineType] = useState("g2-standard-8");
 
   const [snackbarContent, setSnackbarContent] = useState("");
@@ -88,13 +87,19 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
     formData.append("proteinType", proteinType);
     formData.append("predictionCount", predictionCount);
 
-    formData.append("acceleratorCount", acceleratorCount);
     formData.append("predictMachineType", predictMachineType);
-    
-    formData.append("relaxAcceleratorCount", relaxAcceleratorCount);
+    formData.append(
+      "acceleratorCount",
+      calculateAcceleratorCount(predictMachineType),
+    );
 
     formData.append("relaxMachineType", relaxMachineType);
-    
+    formData.append(
+      "relaxAcceleratorCount",
+      calculateAcceleratorCount(relaxMachineType),
+    );
+
+
     formData.append("file", file);
 
     return axios
@@ -110,12 +115,12 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
         setOpen(true);
         setLoading(false);
       })
-      .catch((error)=>{
+      .catch((error) => {
         setSnackbarContent(error);
         setSnackbarSeverity(errorSeverity);
         setOpen(true);
         setLoading(false);
-      })
+      });
   };
 
   const handleCancelJob = () => {
@@ -316,25 +321,15 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
                   <MenuItem value={"g2-standard-16"}>g2-standard-16</MenuItem>
                   <MenuItem value={"g2-standard-32"}>g2-standard-32</MenuItem>
                   <MenuItem value={"g2-standard-48"}>g2-standard-48</MenuItem>
-                  <MenuItem value={"g2-standard-48"}>a2-highgpu-1g</MenuItem>
-                  <MenuItem value={"g2-standard-48"}>a2-highgpu-2g</MenuItem>
-                  <MenuItem value={"g2-standard-48"}>a2-highgpu-3g</MenuItem>
-                  <MenuItem value={"g2-standard-48"}>a2-highgpu-4g</MenuItem>
-                  <MenuItem value={"g2-standard-48"}>a2-highgpu-8g</MenuItem>
-                  <MenuItem value={"g2-standard-48"}>a2-highgpu-16g</MenuItem>
+                  <MenuItem value={"a2-highgpu-1g"}>a2-highgpu-1g</MenuItem>
+                  <MenuItem value={"a2-highgpu-2g"}>a2-highgpu-2g</MenuItem>
+                  <MenuItem value={"a2-highgpu-4g"}>a2-highgpu-4g</MenuItem>
+                  <MenuItem value={"a2-highgpu-8g"}>a2-highgpu-8g</MenuItem>
+                  <MenuItem value={"a2-megagpu-16g"}>a2-highgpu-16g</MenuItem>
                 </Select>
               </FormControl>
-              <TextField
-                onBlur={(e) => handleChange(e, setAcceleratorCount)}
-                required={true}
-                label="Prediction Accelerator Count"
-                defaultValue={1}
-                sx={{ width: "100%", mt: 2 }}
-                size="small"
-                variant="outlined"
-                helperText="Sample numbers: 1, 4"
-              />
-                <FormControl sx={{ mt: 2, minWidth: "100%" }} size="small">
+          
+              <FormControl sx={{ mt: 2, minWidth: "100%" }} size="small">
                 <InputLabel id="relax-machine-type-select-label">
                   Relaxation Machine Type
                 </InputLabel>
@@ -353,22 +348,12 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
                   <MenuItem value={"g2-standard-48"}>g2-standard-48</MenuItem>
                   <MenuItem value={"a2-highgpu-1g"}>a2-highgpu-1g</MenuItem>
                   <MenuItem value={"a2-highgpu-2g"}>a2-highgpu-2g</MenuItem>
-                  <MenuItem value={"a2-highgpu-3g"}>a2-highgpu-3g</MenuItem>
                   <MenuItem value={"a2-highgpu-4g"}>a2-highgpu-4g</MenuItem>
                   <MenuItem value={"a2-highgpu-8g"}>a2-highgpu-8g</MenuItem>
-                  <MenuItem value={"a2-highgpu-16g"}>a2-highgpu-16g</MenuItem>
+                  <MenuItem value={"a2-megagpu-16g"}>a2-highgpu-16g</MenuItem>
                 </Select>
               </FormControl>
-              <TextField
-                onBlur={(e) => handleChange(e, setRelaxAcceleratorCount)}
-                required={true}
-                label="Relaxation Accelerator Count"
-                defaultValue={1}
-                sx={{ width: "100%", mt: 2 }}
-                size="small"
-                variant="outlined"
-                helperText="Sample numbers: 1, 4"
-              />
+            
             </AccordionDetails>
           </Accordion>
         </span>

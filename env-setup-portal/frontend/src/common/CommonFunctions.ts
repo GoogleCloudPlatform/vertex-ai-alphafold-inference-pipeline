@@ -87,6 +87,29 @@ function checkAndExecuteFn(fn: (...args: any[]) => any, ...args: any[]): any {
   }
 }
 
+/**
+ * Given a machine type return the accelerator count
+ * @param machineType A100 or NVIDIA_L4 machine type
+ */
+function calculateAcceleratorCount(machineType: string): string {
+  switch (machineType) {
+    case "g2-standard-48":
+      return "4";
+    case "g2-standard-96":
+      return "8";
+    case "a2-highgpu-2g":
+      return "2";
+    case "a2-highgpu-4g":
+      return "4";
+    case "a2-highgpu-8g":
+      return "8";
+    case "a2-megagpu-16g":
+      return "16";
+    default:
+      return "1";
+  }
+}
+
 class AttributeData {
   attribute: object;
   value: AttributeValue;
@@ -165,6 +188,7 @@ export {
   initValueInMap,
   convertArrayToMap,
   checkAndExecuteFn,
+  calculateAcceleratorCount,
   ComponentData,
   AttributeData,
   AttributeValue,
