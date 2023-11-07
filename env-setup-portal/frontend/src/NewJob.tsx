@@ -317,15 +317,15 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
                   size="small"
                   onChange={(e) => handleChange(e, setPredictMachineType)}
                 >
-                  <MenuItem value={"g2-standard-8"}>g2-standard-8</MenuItem>
-                  <MenuItem value={"g2-standard-16"}>g2-standard-16</MenuItem>
-                  <MenuItem value={"g2-standard-32"}>g2-standard-32</MenuItem>
-                  <MenuItem value={"g2-standard-48"}>g2-standard-48</MenuItem>
-                  <MenuItem value={"a2-highgpu-1g"}>a2-highgpu-1g</MenuItem>
-                  <MenuItem value={"a2-highgpu-2g"}>a2-highgpu-2g</MenuItem>
-                  <MenuItem value={"a2-highgpu-4g"}>a2-highgpu-4g</MenuItem>
-                  <MenuItem value={"a2-highgpu-8g"}>a2-highgpu-8g</MenuItem>
-                  <MenuItem value={"a2-megagpu-16g"}>a2-highgpu-16g</MenuItem>
+                  <MenuItem value={"g2-standard-8"}>g2-standard-8 (L4)</MenuItem>
+                  <MenuItem value={"g2-standard-16"}>g2-standard-16 (L4)</MenuItem>
+                  <MenuItem value={"g2-standard-32"}>g2-standard-32 (L4)</MenuItem>
+                  <MenuItem value={"g2-standard-48"}>g2-standard-48 (L4)</MenuItem>
+                  <MenuItem value={"a2-highgpu-1g"}>a2-highgpu-1g (A100)</MenuItem>
+                  <MenuItem value={"a2-highgpu-2g"}>a2-highgpu-2g (A100)</MenuItem>
+                  <MenuItem value={"a2-highgpu-4g"}>a2-highgpu-4g (A100)</MenuItem>
+                  <MenuItem value={"a2-highgpu-8g"}>a2-highgpu-8g (A100)</MenuItem>
+                  <MenuItem value={"a2-megagpu-16g"}>a2-highgpu-16g (A100)</MenuItem>
                 </Select>
               </FormControl>
           
@@ -342,15 +342,15 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
                   size="small"
                   onChange={(e) => handleChange(e, setRelaxMachineType)}
                 >
-                  <MenuItem value={"g2-standard-8"}>g2-standard-8</MenuItem>
-                  <MenuItem value={"g2-standard-16"}>g2-standard-16</MenuItem>
-                  <MenuItem value={"g2-standard-32"}>g2-standard-32</MenuItem>
-                  <MenuItem value={"g2-standard-48"}>g2-standard-48</MenuItem>
-                  <MenuItem value={"a2-highgpu-1g"}>a2-highgpu-1g</MenuItem>
-                  <MenuItem value={"a2-highgpu-2g"}>a2-highgpu-2g</MenuItem>
-                  <MenuItem value={"a2-highgpu-4g"}>a2-highgpu-4g</MenuItem>
-                  <MenuItem value={"a2-highgpu-8g"}>a2-highgpu-8g</MenuItem>
-                  <MenuItem value={"a2-megagpu-16g"}>a2-highgpu-16g</MenuItem>
+                  <MenuItem value={"g2-standard-8"}>g2-standard-8 (L4)</MenuItem>
+                  <MenuItem value={"g2-standard-16"}>g2-standard-16 (L4)</MenuItem>
+                  <MenuItem value={"g2-standard-32"}>g2-standard-32 (L4)</MenuItem>
+                  <MenuItem value={"g2-standard-48"}>g2-standard-48 (L4)</MenuItem>
+                  <MenuItem value={"a2-highgpu-1g"}>a2-highgpu-1g (A100)</MenuItem>
+                  <MenuItem value={"a2-highgpu-2g"}>a2-highgpu-2g (A100)</MenuItem>
+                  <MenuItem value={"a2-highgpu-4g"}>a2-highgpu-4g (A100)</MenuItem>
+                  <MenuItem value={"a2-highgpu-8g"}>a2-highgpu-8g (A100)</MenuItem>
+                  <MenuItem value={"a2-megagpu-16g"}>a2-highgpu-16g (A100)</MenuItem>
                 </Select>
               </FormControl>
             
