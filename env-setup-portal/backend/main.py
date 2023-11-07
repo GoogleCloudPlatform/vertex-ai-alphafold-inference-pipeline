@@ -37,6 +37,7 @@ from src.utils import compile_utils
 
 # Basic running parameters
 PROJECT_ID = os.environ.get("PROJECT_ID")  # Change to your project ID
+PROJECT_NUMBER = os.environ.get("PROJECT_NUMBER")  # Change to your project ID
 ZONE = os.environ.get("ZONE")  # Change to your zone (example: us-central1-c)
 BUCKET_NAME = os.environ.get("BUCKET_NAME")  # Change to your bucket name
 FILESTORE_ID = os.environ.get("FILESTORE_ID") # Change to your Filestore ID
@@ -119,6 +120,11 @@ def formatUrlLink(name, region, project_id):
     pipeline_run_name = name.split('/')[-1:][0]
     return f'https://console.cloud.google.com/vertex-ai/locations/{region}/pipelines/runs/{pipeline_run_name}?project={project_id}'
 
+def formatUrlAllStructures(pipeline_name, bucket_name, exp_id, project_number):
+    pipeline_run_name = pipeline_name.split('/')[-1:][0]
+    return f'https://console.cloud.google.com/storage/browser/{bucket_name}/pipeline_runs/universal-pipeline-{exp_id}/{project_number}/{pipeline_run_name}'
+
+
 @app.route("/clientid", methods=['GET'])
 def get_clientid():
     return f'{os.environ.get("OAUTH2_CLIENT_ID")}'
@@ -141,6 +147,7 @@ def get_dashboarddata():
             labels = pipe.labels
             status = pipe.state.name.split("_")[-1]
             url_link = formatUrlLink(pipe.name, REGION, PROJECT_ID)
+            url_all_structures = formatUrlAllStructures(pipe.name, BUCKET_NAME, labels['experiment_id'], PROJECT_NUMBER)
 
             if pipe.end_time:
                 duration = pipe.end_time - ( pipe.end_time if pipe.start_time is None else pipe.start_time)
@@ -157,6 +164,7 @@ def get_dashboarddata():
                 "status":status,
                 "duration":ti,
                 "url_link": url_link,
+                "url_all_structures": url_all_structures,
                 "user": labels['user']
             }
             running_pp.append(p_data)

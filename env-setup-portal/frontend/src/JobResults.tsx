@@ -50,6 +50,10 @@ export default function JobResults() {
                 <a href={row.url_link} target="_blank">
                   {row.experiment_id}
                 </a>
+                &nbsp;|&nbsp;
+                <a href={row.url_all_structures} target="_blank">
+                  all candidates structures
+                </a>
               </TableCell>
               <TableCell align="left">{row.user}</TableCell>
               <TableCell align="right">{row.sequence}</TableCell>
