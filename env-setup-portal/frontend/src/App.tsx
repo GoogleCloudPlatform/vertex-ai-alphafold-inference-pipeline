@@ -116,11 +116,11 @@ function App() {
               createMode={true}
               onClose={(refresh: boolean) => {
                 setDrawerOpen(false);
-                if(refresh){
+                if (refresh) {
                   setJobsRefresh(!jobsRefresh);
                   showSnackbar("Folding is in progress...", "success");
                 }
-                window.scrollTo(0,0);
+                window.scrollTo(0, 0);
               }}
               onError={setShowNotification}
             />

@@ -143,7 +143,7 @@ resource "google_cloud_run_v2_service" "alphafold_portal" {
       }
       env {
         name  = "PROJECT_NUMBER"
-        value = data.google_project.project.number
+        value = data.google_project.gcp_project_info.number
       }
       env {
         name  = "ZONE"
