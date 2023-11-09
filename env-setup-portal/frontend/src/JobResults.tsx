@@ -38,6 +38,8 @@ export default function JobResults(props: any) {
             <TableCell align="right">Sequence</TableCell>
             <TableCell align="right">Status</TableCell>
             <TableCell align="right">Duration</TableCell>
+            <TableCell align="right">Top Prediction</TableCell>
+            <TableCell align="right">Top Relaxation</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -59,6 +61,24 @@ export default function JobResults(props: any) {
               <TableCell align="right">{row.sequence}</TableCell>
               <TableCell align="right">{row.status}</TableCell>
               <TableCell align="right">{row.duration}</TableCell>
+              <TableCell align="right">
+                {row.top_predict_uri === "NA" ? (
+                  "NA"
+                ) : (
+                  <a href={row.top_predict_uri} target="_blank">
+                    Open
+                  </a>
+                )}
+              </TableCell>
+              <TableCell align="right">
+                {row.top_relax_uri === "NA" ? (
+                  "NA"
+                ) : (
+                  <a href={row.top_relax_uri} target="_blank">
+                    Open
+                  </a>
+                )}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

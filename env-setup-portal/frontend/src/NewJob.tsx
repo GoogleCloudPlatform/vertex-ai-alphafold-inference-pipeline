@@ -197,7 +197,6 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
                 if (file) {
                   reader.readAsText(file);
                 }
-                // uploadButtonDiv.current.style.paddingTop = 'unset';
               }}
               accept=".fasta"
             ></input>

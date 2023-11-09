@@ -18,6 +18,7 @@ import json
 from time import sleep
 from datetime import datetime, time
 import os
+import re
 import uuid
 import requests
 from flask import Flask, request, render_template, flash, redirect, send_file, url_for, jsonify, session, Response
@@ -129,6 +130,57 @@ def formatUrlAllStructures(pipeline_name, bucket_name, exp_id, project_number):
 def get_clientid():
     return f'{os.environ.get("OAUTH2_CLIENT_ID")}'
 
+def reformatBucketUri(gcs_uri):
+    if gcs_uri is None:
+        return "NA"
+    folder = gcs_uri.replace("gs://","")
+    folder = re.sub('[\w-]+\.[a-z]*', '', folder)
+    return f'https://console.cloud.google.com/storage/browser/{folder}'
+
+def extract_best_prediction_relaxation_url(_pipe, _client_pipeline):
+    get_request = vertex_ai2.GetPipelineJobRequest(name=_pipe.name) # pipe.name = pipeline ID
+    pipeline_job = _client_pipeline.get_pipeline_job(get_request)
+    predict_tasks = [i for i in pipeline_job.job_detail.task_details if i.task_name == 'predict']
+
+    formated_predict_tasks = []
+
+    for t in predict_tasks:
+        task_id = t.task_id
+        parent_task_id = t.parent_task_id
+        model_name = t.execution.metadata['input:model_name']
+        ranking_confidence = 0 if t.outputs["raw_prediction"].artifacts[0].metadata.get("ranking_confidence") == None else t.outputs['raw_prediction'].artifacts[0].metadata['ranking_confidence']
+        uri = t.outputs['raw_prediction'].artifacts[0].uri
+
+        formated_predict_tasks.append(
+            {
+                'task_id': task_id,
+                'parent_task_id': parent_task_id,
+                'model_name': model_name,
+                'ranking_confidence': ranking_confidence,
+                'uri': uri
+            }
+        )
+
+    # Sort predict tasks by ranking confidence
+    sorted_predict = sorted(formated_predict_tasks, key=lambda x: x['ranking_confidence'], reverse=True)
+
+    top_predict_uri = None if sorted_predict[0].get("uri") == None else sorted_predict[0]["uri"]
+    top_predict_uri = top_predict_uri if ".pkl" in top_predict_uri else None
+
+    # Get Top relaxation
+    condition_relax_parent_id = None
+    for t in pipeline_job.job_detail.task_details:
+        if t.parent_task_id == sorted_predict[0]['parent_task_id'] and 'condition' in t.task_name:
+            condition_relax_parent_id = t.task_id
+            break
+    top_relax_uri = None
+    for t in pipeline_job.job_detail.task_details:
+        if t.parent_task_id == condition_relax_parent_id:
+            top_relax_uri = t.outputs['relaxed_protein'].artifacts[0].uri
+            break
+
+    return [reformatBucketUri(top_predict_uri), reformatBucketUri(top_relax_uri)]
+
 @app.route("/status", methods=['GET'])
 def get_dashboarddata():
     user_info = valid_user()
@@ -141,13 +193,15 @@ def get_dashboarddata():
         list_pipelines = list(client_pipeline.list_pipeline_jobs(list_pipelines_request))
         running_pp = []
         
-
         for pipe in list_pipelines:
             print(f'LIST PIPES {pipe.start_time} {pipe.end_time}')
             labels = pipe.labels
             status = pipe.state.name.split("_")[-1]
             url_link = formatUrlLink(pipe.name, REGION, PROJECT_ID)
             url_all_structures = formatUrlAllStructures(pipe.name, BUCKET_NAME, labels['experiment_id'], PROJECT_NUMBER)
+
+            # Extract metadata about prediction ranking (best)
+            predict_relax_uri = extract_best_prediction_relaxation_url(pipe, client_pipeline)
 
             if pipe.end_time:
                 duration = pipe.end_time - ( pipe.end_time if pipe.start_time is None else pipe.start_time)
@@ -165,10 +219,11 @@ def get_dashboarddata():
                 "duration":ti,
                 "url_link": url_link,
                 "url_all_structures": url_all_structures,
+                "top_predict_uri": predict_relax_uri[0], # first index is predict URL
+                "top_relax_uri": predict_relax_uri[1],
                 "user": labels['user']
             }
             running_pp.append(p_data)
-        print(running_pp)
         return jsonify(running_pp)
     else:
         return Response("{'status':'Unauthorized'}", status=401, mimetype='application/json')
