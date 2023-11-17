@@ -16,7 +16,7 @@
 
 import json
 from time import sleep
-from datetime import datetime, time
+from datetime import datetime, timezone
 import os
 import re
 import uuid
@@ -52,8 +52,6 @@ FILESTORE_IP, FILESTORE_NETWORK = compile_utils.get_filestore_info(
     project_id=PROJECT_ID, instance_id=FILESTORE_ID, location=ZONE)
 
 
-print(f'ENV CLIENTID {os.environ.get("OAUTH2_CLIENT_ID")}')
-
 storage_client = storage.Client(project=PROJECT_ID)
 vertex_ai.init(
     project=PROJECT_ID,
@@ -75,7 +73,6 @@ def upload_to_bucket(blob_name, the_file, bucket_name):
     except Exception as e:
         return f'FAILED to upload fasta file to GCS Bucket.\n{e}'
     
-
 
 app = Flask(__name__)
 CORS(app)
@@ -137,7 +134,7 @@ def reformatBucketUri(gcs_uri):
     folder = re.sub('[\w-]+\.[a-z]*', '', folder)
     return f'https://console.cloud.google.com/storage/browser/{folder}'
 
-def extract_best_prediction_relaxation_url(_pipe, _client_pipeline):
+def extract_best_prediction_relaxation_url(_pipe, _client_pipeline, _status):
     get_request = vertex_ai2.GetPipelineJobRequest(name=_pipe.name) # pipe.name = pipeline ID
     pipeline_job = _client_pipeline.get_pipeline_job(get_request)
     predict_tasks = [i for i in pipeline_job.job_detail.task_details if i.task_name == 'predict']
@@ -164,26 +161,32 @@ def extract_best_prediction_relaxation_url(_pipe, _client_pipeline):
     # Sort predict tasks by ranking confidence
     sorted_predict = sorted(formated_predict_tasks, key=lambda x: x['ranking_confidence'], reverse=True)
 
-    top_predict_uri = None if sorted_predict[0].get("uri") == None else sorted_predict[0]["uri"]
-    top_predict_uri = top_predict_uri if ".pkl" in top_predict_uri else None
-
-    # Get Top relaxation
-    condition_relax_parent_id = None
-    for t in pipeline_job.job_detail.task_details:
-        if t.parent_task_id == sorted_predict[0]['parent_task_id'] and 'condition' in t.task_name:
-            condition_relax_parent_id = t.task_id
-            break
+    top_predict_uri = None
     top_relax_uri = None
-    for t in pipeline_job.job_detail.task_details:
-        if t.parent_task_id == condition_relax_parent_id:
-            top_relax_uri = t.outputs['relaxed_protein'].artifacts[0].uri
-            break
+
+    if _status != "RUNNING":
+        # Get top prediction
+        if len(sorted_predict) > 0:
+            top_predict_uri = None if sorted_predict[0].get("uri") == None else sorted_predict[0]["uri"]
+            top_predict_uri = top_predict_uri if ".pkl" in top_predict_uri else None
+
+        # Get top relaxation
+        condition_relax_parent_id = None
+        for t in pipeline_job.job_detail.task_details:
+            if t.parent_task_id == sorted_predict[0]['parent_task_id'] and 'condition' in t.task_name:
+                condition_relax_parent_id = t.task_id
+                break
+        for t in pipeline_job.job_detail.task_details:
+            if t.parent_task_id == condition_relax_parent_id:
+                top_relax_uri = t.outputs['relaxed_protein'].artifacts[0].uri
+                break
 
     return [reformatBucketUri(top_predict_uri), reformatBucketUri(top_relax_uri)]
 
 @app.route("/status", methods=['GET'])
 def get_dashboarddata():
     user_info = valid_user()
+
     if user_info is not None:
         API_ENDPOINT = "{}-aiplatform.googleapis.com".format(REGION)
         # Create Pipelines and Metadata service clients
@@ -194,24 +197,23 @@ def get_dashboarddata():
         running_pp = []
         
         for pipe in list_pipelines:
-            print(f'LIST PIPES {pipe.start_time} {pipe.end_time}')
             labels = pipe.labels
             status = pipe.state.name.split("_")[-1]
             url_link = formatUrlLink(pipe.name, REGION, PROJECT_ID)
             url_all_structures = formatUrlAllStructures(pipe.name, BUCKET_NAME, labels['experiment_id'], PROJECT_NUMBER)
 
             # Extract metadata about prediction ranking (best)
-            predict_relax_uri = extract_best_prediction_relaxation_url(pipe, client_pipeline)
-
+            predict_relax_uri = extract_best_prediction_relaxation_url(pipe, client_pipeline, status)
             if pipe.end_time:
                 duration = pipe.end_time - ( pipe.end_time if pipe.start_time is None else pipe.start_time)
-                seconds = duration.total_seconds()
-                hours = int(seconds // 3600)
-                minutes = int((seconds % 3600) // 60)
-                seconds = seconds % 60
-                ti = f'{hours}h{minutes}m'
             else:
-                ti = 0
+                duration = datetime.now(timezone.utc) - pipe.start_time
+
+            seconds = duration.total_seconds()
+            hours = int(seconds // 3600)
+            minutes = int((seconds % 3600) // 60)
+            seconds = seconds % 60
+            ti = f'{hours}h{minutes}m'
             p_data ={
                 "experiment_id":labels['experiment_id'],
                 "sequence":labels['sequence_id'],
@@ -236,11 +238,10 @@ def valid_user():
     GOOGLE_TOKEN_INFO_ENDPOINT = "https://oauth2.googleapis.com/tokeninfo"
     parameters = { "id_token": token}
     user_info = get_user_data(GOOGLE_TOKEN_INFO_ENDPOINT, parameters)
-    print(f'USER INFO {user_info}')
     # check for 1.Hashed email match 2.Expiry token 3.Non Empty
-    if user_info is None: return False
-    # check expiry TODO
-    if datetime.now().timestamp() > float(user_info['exp']): return False
+    if user_info is not None:
+        # check token expiry
+        if datetime.now().timestamp() > float(user_info['exp']): return None
     return user_info
 
 def decide_accelerator_type(machine_type):
@@ -259,7 +260,6 @@ def foldtest():
         if 'file' not in request.files:
             flash('No file part')
             return Response('{"status":"uploaded file missing."}',status=400, mimetype='application/json')
-        print(f'INCOMING REQ {request.form}\n{request.files["file"]}')
         f = request.files['file']
 
         timestamp = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -280,19 +280,18 @@ def foldtest():
 
         sleep(3)
         gcs_path = upload_to_bucket(gcs_sequence_path,filename,BUCKET_NAME)
-        print(f"Protein file uploaded tos: {gcs_path}")
+        print(f"Protein file uploaded to: {gcs_path}")
 
         # is_monomer, sequences = fasta_utils.validate_fasta_file_gcs(gcs_path,gcs_sequence_path,BUCKET_NAME,storage_client)
         is_monomer, sequences = fasta_utils.validate_fasta_file(filename)
         # TODO delete local disk fasta file after validate
         print(f'IS MONOMER {is_monomer}\n{sequences}')
 
-
         # Capturing the running parameters of the pipeline
         params = {
         'sequence_path': gcs_path,
         'max_template_date': '2030-01-01',
-        'use_small_bfd': bool(form["smallBFD"]),
+        'use_small_bfd': True if form["smallBFD"] == "yes" else False,
         'num_multimer_predictions_per_model': int(form["predictionCount"]),
         'is_run_relax': 'relax' if str(form["relaxation"]).lower() == "yes" else '', 
         'model_preset': str(form["proteinType"]).lower(),
@@ -325,7 +324,6 @@ def foldtest():
 
         # Run FOLD
         # Running the existing pipeline
-        print(f'USERINFO {user_info}')
         labels = { 'experiment_id': experiment_id
                  , 'sequence_id': filename.split(sep='.')[0].lower()
                  , 'user': f'{user_info["given_name"].lower()}_{user_info["family_name"].lower()}'

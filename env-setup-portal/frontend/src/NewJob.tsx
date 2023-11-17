@@ -256,7 +256,7 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
               value={smallBFD}
               label="Use Small BFD"
               size="small"
-              onChange={(e) => handleChange(e, setSmallBFD)}
+              onChange={(e: any) => handleChange(e, setSmallBFD)}
             >
               <MenuItem value={"yes"}>Yes</MenuItem>
               <MenuItem value={"no"}>No</MenuItem>
