@@ -166,20 +166,21 @@ def extract_best_prediction_relaxation_url(_pipe, _client_pipeline, _status):
 
     if _status != "RUNNING":
         # Get top prediction
+        print(f'sorted_predict {sorted_predict}')
         if len(sorted_predict) > 0:
             top_predict_uri = None if sorted_predict[0].get("uri") == None else sorted_predict[0]["uri"]
             top_predict_uri = top_predict_uri if ".pkl" in top_predict_uri else None
 
-        # Get top relaxation
-        condition_relax_parent_id = None
-        for t in pipeline_job.job_detail.task_details:
-            if t.parent_task_id == sorted_predict[0]['parent_task_id'] and 'condition' in t.task_name:
-                condition_relax_parent_id = t.task_id
-                break
-        for t in pipeline_job.job_detail.task_details:
-            if t.parent_task_id == condition_relax_parent_id:
-                top_relax_uri = t.outputs['relaxed_protein'].artifacts[0].uri
-                break
+            # Get top relaxation
+            condition_relax_parent_id = None
+            for t in pipeline_job.job_detail.task_details:
+                if t.parent_task_id == sorted_predict[0]['parent_task_id'] and 'condition' in t.task_name:
+                    condition_relax_parent_id = t.task_id
+                    break
+            for t in pipeline_job.job_detail.task_details:
+                if t.parent_task_id == condition_relax_parent_id:
+                    top_relax_uri = t.outputs['relaxed_protein'].artifacts[0].uri
+                    break
 
     return [reformatBucketUri(top_predict_uri), reformatBucketUri(top_relax_uri)]
 
