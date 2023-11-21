@@ -17,6 +17,7 @@ resource "google_project_iam_member" "default_compute_engine_sa_role_bindings" {
   for_each = toset(var.compute_engine_sa_roles)
   role     = "roles/${each.value}"
   member   = "serviceAccount:${data.google_project.project.number}-compute@developer.gserviceaccount.com"
+  depends_on  = [google_project_service.enable_required_services]
 }
 
 resource "google_project_iam_member" "cloud_build_sa_role_bindings" {
@@ -24,6 +25,7 @@ resource "google_project_iam_member" "cloud_build_sa_role_bindings" {
   for_each = toset(var.cloud_build_sa_roles)
   role     = "roles/${each.value}"
   member   = "serviceAccount:${data.google_project.project.number}@cloudbuild.gserviceaccount.com"
+  depends_on  = [google_project_service.enable_required_services]
 }
 
 # Create Vertex Training service account
@@ -31,6 +33,7 @@ resource "google_service_account" "training_sa" {
   project      = data.google_project.project.project_id
   account_id   = var.training_sa_name
   display_name = "Vertex Training service account"
+  depends_on  = [google_project_service.enable_required_services]
 }
 
 # Create Vertex Training SA role bindings
@@ -47,6 +50,7 @@ resource "google_service_account" "pipelines_sa" {
   project      = data.google_project.project.project_id
   account_id   = var.pipelines_sa_name
   display_name = "Vertex Pipelines account name"
+  depends_on  = [google_project_service.enable_required_services]
 }
 
 # Create Vertex Pipelines SA role bindings
