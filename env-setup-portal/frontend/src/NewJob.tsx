@@ -55,7 +55,7 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
   const [smallBFD, setSmallBFD] = useState("yes");
   const [proteinType, setProteinType] = useState("");
   const [relaxation, setRelaxation] = useState("no");
-  const [predictionCount, setPredictionCount] = useState("");
+  const [predictionCount, setPredictionCount] = useState("3");
   const [predictMachineType, setPredictMachineType] = useState("g2-standard-8");
   const [relaxMachineType, setRelaxMachineType] = useState("g2-standard-8");
 
@@ -145,9 +145,11 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
         },
       })
       .then((res) => {
-        const protein = res.data.isMonomer ? "monomer" : "multimer"
-        setProteinType(protein)
-        setFastaCheckResult(` Protein Type: ${protein}. Residue: ${res.data.residue}`)
+        const protein = res.data.isMonomer ? "monomer" : "multimer";
+        setProteinType(protein);
+        setFastaCheckResult(
+          ` Protein Type: ${protein}. Residue: ${res.data.residue}`,
+        );
         setLoading(false);
       })
       .catch((error) => {
@@ -159,12 +161,11 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
   };
 
   useEffect(() => {
-    if(file){
+    if (file) {
       handleCheckFasta();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[file]);
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [file]);
 
   const handleCancelJob = () => {
     onClose(false);
@@ -257,9 +258,7 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
               >
                 check_circle
               </span>
-              <span>
-                {fastaCheckResult}
-              </span>
+              <span>{fastaCheckResult}</span>
             </div>
           ) : (
             "No file chosen."
@@ -288,9 +287,9 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
             helperText="Ex: amylase-fold-12"
           />
         </span>
-        
+
         <span style={{ width: "90%", marginTop: "25px" }}>
-          <Accordion sx={{ width: '482px'}}>
+          <Accordion sx={{ width: "482px" }}>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel1a-content"
@@ -299,8 +298,10 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
               <Typography>Advanced Settings</Typography>
             </AccordionSummary>
             <AccordionDetails>
-            <FormControl sx={{ mt: 2, minWidth: "100%" }} size="small">
-                <InputLabel id="protein-type-select-label">Protein Type</InputLabel>
+              <FormControl sx={{ mt: 2, minWidth: "100%" }} size="small">
+                <InputLabel id="protein-type-select-label">
+                  Protein Type
+                </InputLabel>
                 <Select
                   labelId="protein-type-select-label"
                   required={true}
@@ -315,7 +316,9 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
                 </Select>
               </FormControl>
               <FormControl sx={{ mt: 2, minWidth: "100%" }} size="small">
-                <InputLabel id="small-bfd-select-label">Use Small BFD</InputLabel>
+                <InputLabel id="small-bfd-select-label">
+                  Use Small BFD
+                </InputLabel>
                 <Select
                   labelId="small-bfd-select-label"
                   required={true}
@@ -333,10 +336,10 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
                 required={true}
                 onBlur={(e) => handleChange(e, setPredictionCount)}
                 label="Multimer Predictions per model (#)"
-                sx={{ width: '100%', mt: 2 }}
+                sx={{ width: "100%", mt: 2 }}
                 size="small"
+                value={predictionCount}
                 variant="outlined"
-                defaultValue={3}
                 helperText="Sample numbers: 3, 4, 5, 6. Ex: 3"
               />
               <FormControl sx={{ mt: 2, minWidth: "100%" }} size="small">

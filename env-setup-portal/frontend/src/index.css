@@ -61,3 +61,12 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+
+.external-button {
+  background-color: #e65100;
+  border-radius: 0.75rem;
+  color: #fff;
+  max-width: 9ch;
+  padding: 0.5rem;
+  text-decoration: none;
+}
