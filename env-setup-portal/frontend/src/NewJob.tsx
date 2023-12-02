@@ -36,7 +36,7 @@ import {
   AccordionDetails,
 } from "@mui/material";
 import axios from "axios";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { globalContext } from "./App";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { calculateAcceleratorCount } from "./common/CommonFunctions";
@@ -48,11 +48,13 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
   const successSeverity: AlertColor = "success";
 
   const [fileName, setFileName] = useState<string | null>(null);
+  const [fastaCheckResult, setFastaCheckResult] = useState<string | null>(null);
   const [file, setFile] = useState<any>(null);
   const [experimentId, setExperimentId] = useState("");
-  const [smallBFD, setSmallBFD] = useState("");
+  const [runTag, setRunTag] = useState("");
+  const [smallBFD, setSmallBFD] = useState("yes");
   const [proteinType, setProteinType] = useState("");
-  const [relaxation, setRelaxation] = useState("");
+  const [relaxation, setRelaxation] = useState("no");
   const [predictionCount, setPredictionCount] = useState("");
   const [predictMachineType, setPredictMachineType] = useState("g2-standard-8");
   const [relaxMachineType, setRelaxMachineType] = useState("g2-standard-8");
@@ -81,6 +83,7 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
     }
 
     const formData = new FormData();
+    formData.append("runTag", runTag);
     formData.append("experimentId", experimentId);
     formData.append("smallBFD", smallBFD);
     formData.append("relaxation", relaxation);
@@ -122,6 +125,46 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
         setLoading(false);
       });
   };
+
+  const handleCheckFasta = () => {
+    if (!accessToken) {
+      setSnackbarContent("AccessToken is missing. Please login first.");
+      setOpen(true);
+      return;
+    }
+    setLoading(true);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return axios
+      .post(`${BACKEND_HOST}/check-fasta`, formData, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => {
+        const protein = res.data.isMonomer ? "monomer" : "multimer"
+        setProteinType(protein)
+        setFastaCheckResult(` Protein Type: ${protein}. Residue: ${res.data.residue}`)
+        setLoading(false);
+      })
+      .catch((error) => {
+        setSnackbarContent(error);
+        setSnackbarSeverity(errorSeverity);
+        setOpen(true);
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    if(file){
+      handleCheckFasta();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[file]);
+
 
   const handleCancelJob = () => {
     onClose(false);
@@ -193,6 +236,7 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
                 reader.onload = () => {
                   setFile(file);
                   setFileName(file.name);
+                  handleCheckFasta();
                 };
                 if (file) {
                   reader.readAsText(file);
@@ -213,11 +257,26 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
               >
                 check_circle
               </span>
+              <span>
+                {fastaCheckResult}
+              </span>
             </div>
           ) : (
             "No file chosen."
           )}
         </div>
+        <span style={{ width: "90%" }}>
+          <TextField
+            onBlur={(e) => handleChange(e, setRunTag)}
+            required={true}
+            label="Run Tag"
+            variant="outlined"
+            sx={{ width: "100%", mt: 2 }}
+            size="small"
+            helperText="This is used to group multiple experiment 
+              ID under the same group. Ex: group-amylase"
+          />
+        </span>
         <span style={{ width: "90%" }}>
           <TextField
             onBlur={(e) => handleChange(e, setExperimentId)}
@@ -229,80 +288,74 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
             helperText="Ex: amylase-fold-12"
           />
         </span>
-        <span style={{ width: "90%" }}>
-          <FormControl sx={{ mt: 2, minWidth: "100%" }} size="small">
-            <InputLabel id="protein-type-select-label">Protein Type</InputLabel>
-            <Select
-              labelId="protein-type-select-label"
-              required={true}
-              id="proteinType"
-              value={proteinType}
-              label="Protein Type"
-              size="small"
-              onChange={(e) => handleChange(e, setProteinType)}
-            >
-              <MenuItem value={"monomer"}>Monomer</MenuItem>
-              <MenuItem value={"multimer"}>Multimer</MenuItem>
-            </Select>
-          </FormControl>
-        </span>
-        <span style={{ width: "90%" }}>
-          <FormControl sx={{ mt: 2, minWidth: "100%" }} size="small">
-            <InputLabel id="small-bfd-select-label">Use Small BFD</InputLabel>
-            <Select
-              labelId="small-bfd-select-label"
-              required={true}
-              id="useSmallBfd"
-              value={smallBFD}
-              label="Use Small BFD"
-              size="small"
-              onChange={(e: any) => handleChange(e, setSmallBFD)}
-            >
-              <MenuItem value={"yes"}>Yes</MenuItem>
-              <MenuItem value={"no"}>No</MenuItem>
-            </Select>
-          </FormControl>
-        </span>
-        <span style={{ width: "90%" }}>
-          <TextField
-            required={true}
-            onBlur={(e) => handleChange(e, setPredictionCount)}
-            label="Multimer Predictions per model (#)"
-            sx={{ width: "100%", mt: 2 }}
-            size="small"
-            variant="outlined"
-            helperText="Sample numbers: 3, 4, 5, 6. Ex: 3"
-          />
-        </span>
-        <span style={{ width: "90%" }}>
-          <FormControl sx={{ mt: 2, minWidth: "100%" }} size="small">
-            <InputLabel id="relaxation-select-label">
-              Run relaxation after folding
-            </InputLabel>
-            <Select
-              labelId="relaxation-select-label"
-              required={true}
-              id="relaxation"
-              value={relaxation}
-              label="Run relaxation after folding"
-              size="small"
-              onChange={(e) => handleChange(e, setRelaxation)}
-            >
-              <MenuItem value={"yes"}>Yes</MenuItem>
-              <MenuItem value={"no"}>No</MenuItem>
-            </Select>
-          </FormControl>
-        </span>
+        
         <span style={{ width: "90%", marginTop: "25px" }}>
-          <Accordion>
+          <Accordion sx={{ width: '482px'}}>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel1a-content"
               id="panel1a-header"
             >
-              <Typography>Machine Settings</Typography>
+              <Typography>Advanced Settings</Typography>
             </AccordionSummary>
             <AccordionDetails>
+            <FormControl sx={{ mt: 2, minWidth: "100%" }} size="small">
+                <InputLabel id="protein-type-select-label">Protein Type</InputLabel>
+                <Select
+                  labelId="protein-type-select-label"
+                  required={true}
+                  id="proteinType"
+                  value={proteinType}
+                  label="Protein Type"
+                  size="small"
+                  onChange={(e) => handleChange(e, setProteinType)}
+                >
+                  <MenuItem value={"monomer"}>Monomer</MenuItem>
+                  <MenuItem value={"multimer"}>Multimer</MenuItem>
+                </Select>
+              </FormControl>
+              <FormControl sx={{ mt: 2, minWidth: "100%" }} size="small">
+                <InputLabel id="small-bfd-select-label">Use Small BFD</InputLabel>
+                <Select
+                  labelId="small-bfd-select-label"
+                  required={true}
+                  id="useSmallBfd"
+                  value={smallBFD}
+                  label="Use Small BFD"
+                  size="small"
+                  onChange={(e: any) => handleChange(e, setSmallBFD)}
+                >
+                  <MenuItem value={"yes"}>Yes</MenuItem>
+                  <MenuItem value={"no"}>No</MenuItem>
+                </Select>
+              </FormControl>
+              <TextField
+                required={true}
+                onBlur={(e) => handleChange(e, setPredictionCount)}
+                label="Multimer Predictions per model (#)"
+                sx={{ width: '100%', mt: 2 }}
+                size="small"
+                variant="outlined"
+                defaultValue={3}
+                helperText="Sample numbers: 3, 4, 5, 6. Ex: 3"
+              />
+              <FormControl sx={{ mt: 2, minWidth: "100%" }} size="small">
+                <InputLabel id="relaxation-select-label">
+                  Run relaxation after folding
+                </InputLabel>
+                <Select
+                  labelId="relaxation-select-label"
+                  required={true}
+                  id="relaxation"
+                  value={relaxation}
+                  label="Run relaxation after folding"
+                  size="small"
+                  onChange={(e) => handleChange(e, setRelaxation)}
+                >
+                  <MenuItem value={"yes"}>Yes</MenuItem>
+                  <MenuItem value={"no"}>No</MenuItem>
+                </Select>
+              </FormControl>
               <FormControl sx={{ mt: 2, minWidth: "100%" }} size="small">
                 <InputLabel id="predict-machine-type-select-label">
                   Prediction Machine Type

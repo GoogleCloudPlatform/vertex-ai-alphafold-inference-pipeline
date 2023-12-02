@@ -48,9 +48,12 @@ AR_REPO_NAME = os.environ.get("AR_REPO_NAME")
 FILESTORE_MOUNT_PATH = os.environ.get("FILESTORE_MOUNT_PATH") 
 MODEL_PARAMS = f'gs://{BUCKET_NAME}'
 IMAGE_URI = f'{REGION}-docker.pkg.dev/{PROJECT_ID}/{AR_REPO_NAME}/alphafold-components'
-FILESTORE_IP, FILESTORE_NETWORK = compile_utils.get_filestore_info(
-    project_id=PROJECT_ID, instance_id=FILESTORE_ID, location=ZONE)
 
+try :
+    FILESTORE_IP, FILESTORE_NETWORK = compile_utils.get_filestore_info(
+        project_id=PROJECT_ID, instance_id=FILESTORE_ID, location=ZONE)
+except:
+    print("WARNING - Filestore instance is not present. This will fail to run folding job.")
 
 storage_client = storage.Client(project=PROJECT_ID)
 vertex_ai.init(
@@ -104,6 +107,18 @@ def AFportal():
     # Default static hosting that points to React's output
     return render_template('index.html')
 
+@app.route("/check-fasta", methods=['POST'])
+def check_fasta():
+    if 'file' in request.files:
+        f = request.files['file']
+        filename = secure_filename(f.filename )
+        print(f"The to be checked filename was: {filename}")
+        is_monomer, sequences = fasta_utils.validate_fasta_file(filename)
+        return jsonify({
+            "isMonomer": is_monomer,
+            "residue": len(sequences)
+        })
+    return "no result"
 
 def get_user_data(url, parameters):
         response = requests.get(url, params=parameters)
@@ -166,7 +181,6 @@ def extract_best_prediction_relaxation_url(_pipe, _client_pipeline, _status):
 
     if _status != "RUNNING":
         # Get top prediction
-        print(f'sorted_predict {sorted_predict}')
         if len(sorted_predict) > 0:
             top_predict_uri = None if sorted_predict[0].get("uri") == None else sorted_predict[0]["uri"]
             top_predict_uri = top_predict_uri if ".pkl" in top_predict_uri else None
@@ -216,6 +230,7 @@ def get_dashboarddata():
             seconds = seconds % 60
             ti = f'{hours}h{minutes}m'
             p_data ={
+                "run_tag": labels['run_tag'],
                 "experiment_id":labels['experiment_id'],
                 "sequence":labels['sequence_id'],
                 "status":status,
@@ -254,7 +269,7 @@ def decide_accelerator_type(machine_type):
         return "NVIDIA_L4"
 
 @app.route("/fold",methods=['POST'])
-def foldtest():
+def fold():
     user_info = valid_user()
     if user_info is not None:
         #  check if the post request has the file part
@@ -317,6 +332,7 @@ def foldtest():
         
         # Compile the pipeline
         from src.pipelines.alphafold_inference_pipeline import alphafold_inference_pipeline as pipeline
+        run_tag = str(form["runTag"]).lower()
         experiment_id = str(form["experimentId"]).lower()
         pipeline_name = f'universal-pipeline-{experiment_id}'
         compiler.Compiler().compile(
@@ -325,7 +341,8 @@ def foldtest():
 
         # Run FOLD
         # Running the existing pipeline
-        labels = { 'experiment_id': experiment_id
+        labels = {'run_tag': run_tag
+                 ,'experiment_id': experiment_id
                  , 'sequence_id': filename.split(sep='.')[0].lower()
                  , 'user': f'{user_info["given_name"].lower()}_{user_info["family_name"].lower()}'
                  }
