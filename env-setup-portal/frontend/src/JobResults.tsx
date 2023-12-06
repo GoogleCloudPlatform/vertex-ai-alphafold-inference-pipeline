@@ -3,38 +3,11 @@ import {
   MaterialReactTable,
   useMaterialReactTable,
 } from "material-react-table";
-import { Button } from "@mui/material";
 
 import { globalContext } from "./App";
 import axios from "axios";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const BACKEND_HOST = import.meta.env.VITE_BACKEND_HOST ?? "";
-
-//data must be stable reference (useState, useMemo, useQuery, defined outside of component, etc.)
-const data = [
-  {
-    name: "John",
-    age: 30,
-  },
-  {
-    name: "Sara",
-    age: 25,
-  },
-  {
-    name: "Ko Ping Ho",
-    age: 25,
-  },
-  {
-    name: "Blundell",
-    age: 25,
-  },
-  {
-    name: "Jamie",
-    age: 30,
-  },
-];
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export default function JobResults(props: any) {
   const [data, setData] = useState([]);
@@ -64,15 +37,21 @@ export default function JobResults(props: any) {
         accessorKey: "run_tag",
         header: "Run Tag",
         muiTableHeadCellProps: { sx: { color: "green" } },
-        Cell: ({ cell }) => <span>{cell.getValue()}</span>,
+        Cell: ({ cell }: { cell: any }) => <span>{cell.getValue()}</span>,
       },
       {
-        accessorFn: (row) => `${row.experiment_id}`,
+        accessorFn: (row: { experiment_id: any }) => `${row.experiment_id}`,
         id: "experiment_id",
         header: "Experiment ID",
         enableGrouping: false,
         muiTableHeadCellProps: { sx: { color: "green" } },
-        Cell: ({ renderedCellValue, row }) => {
+        Cell: ({
+          renderedCellValue,
+          row,
+        }: {
+          renderedCellValue: any;
+          row: any;
+        }) => {
           console.log("WOR", row.original.url_link);
           return (
             <span>
@@ -91,34 +70,34 @@ export default function JobResults(props: any) {
         accessorKey: "user",
         header: "User",
         muiTableHeadCellProps: { sx: { color: "green" } },
-        Cell: ({ cell }) => <span>{cell.getValue()}</span>,
+        Cell: ({ cell }: { cell: any }) => <span>{cell.getValue()}</span>,
       },
       {
         accessorKey: "status",
         header: "Status",
         muiTableHeadCellProps: { sx: { color: "green" } },
-        Cell: ({ cell }) => <span>{cell.getValue()}</span>,
+        Cell: ({ cell }: { cell: any }) => <span>{cell.getValue()}</span>,
       },
       {
         accessorKey: "duration",
         header: "Duration",
         enableGrouping: false,
         muiTableHeadCellProps: { sx: { color: "green" } },
-        Cell: ({ cell }) => <span>{cell.getValue()}</span>,
+        Cell: ({ cell }: { cell: any }) => <span>{cell.getValue()}</span>,
       },
       {
         accessorKey: "sequence",
         header: "Sequence",
         enableGrouping: false,
         muiTableHeadCellProps: { sx: { color: "green" } },
-        Cell: ({ cell }) => <span>{cell.getValue()}</span>,
+        Cell: ({ cell }: { cell: any }) => <span>{cell.getValue()}</span>,
       },
       {
         accessorKey: "top_predict_uri",
         header: "TOP Predict URL",
         enableGrouping: false,
         muiTableHeadCellProps: { sx: { color: "green" } },
-        Cell: ({ row }) => (
+        Cell: ({ row }: { row: any }) => (
           <span>
             {row.original.top_predict_uri === "NA" ? (
               "NA"
@@ -139,7 +118,7 @@ export default function JobResults(props: any) {
         header: "Top Relax URL",
         enableGrouping: false,
         muiTableHeadCellProps: { sx: { color: "green" } },
-        Cell: ({ row }) => (
+        Cell: ({ row }: { row: any }) => (
           <span>
             {row.original.top_relax_uri === "NA" ? (
               "NA"
