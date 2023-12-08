@@ -35,7 +35,7 @@ COPY --from=build-ui-server /app/frontend/dist /app/backend/static
 WORKDIR $APP_HOME/backend
 RUN ls -la $APP_HOME/backend/templates
 RUN ls -la $APP_HOME/backend/static
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Run the web service on container startup. Here we use the gunicorn
 # webserver, with one worker process and 8 threads.

@@ -112,6 +112,8 @@ def check_fasta():
     if 'file' in request.files:
         f = request.files['file']
         filename = secure_filename(f.filename )
+        # save file locally, for fasta validation purpose
+        save_file_locally(f, filename)
         print(f"The to be checked filename was: {filename}")
         is_monomer, sequences = fasta_utils.validate_fasta_file(filename)
         return jsonify({
@@ -290,11 +292,7 @@ def fold():
         gcs_sequence_path = f'fasta/{filename}' # TODO add username subfolder
 
         # save file locally, for fasta validation purpose
-        with open (f'{filename}','wb') as file:
-            content = f.read()
-            file.write(content)
-
-        sleep(3)
+        save_file_locally(f, filename)
         gcs_path = upload_to_bucket(gcs_sequence_path,filename,BUCKET_NAME)
         print(f"Protein file uploaded to: {gcs_path}")
 
@@ -364,6 +362,12 @@ def fold():
                         status=200,mimetype='application/json') 
     else:
         return Response("{'status':'Unauthorized'}", status=401, mimetype='application/json')
+
+def save_file_locally(f, filename):
+    with open (f'{filename}','wb') as file:
+        content = f.read()
+        file.write(content)
+    sleep(3)
     
 
 # ======= Server initialization (listening)
