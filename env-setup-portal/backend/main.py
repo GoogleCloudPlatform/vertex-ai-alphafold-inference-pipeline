@@ -47,7 +47,9 @@ FILESTORE_SHARE = '/datasets'
 AR_REPO_NAME = os.environ.get("AR_REPO_NAME")
 FILESTORE_MOUNT_PATH = os.environ.get("FILESTORE_MOUNT_PATH") 
 MODEL_PARAMS = f'gs://{BUCKET_NAME}'
-IMAGE_URI = f'{REGION}-docker.pkg.dev/{PROJECT_ID}/{AR_REPO_NAME}/alphafold-components'
+IS_GCR_IO_REPO = os.environ.get("IS_GCR_IO_REPO")
+IMAGE_URI = f'gcr.io/{PROJECT_ID}/alphafold-components' if IS_GCR_IO_REPO == "true" else f'{REGION}-docker.pkg.dev/{PROJECT_ID}/{AR_REPO_NAME}/alphafold-components'
+
 
 try :
     FILESTORE_IP, FILESTORE_NETWORK = compile_utils.get_filestore_info(

@@ -54,6 +54,11 @@ variable "ar_repo_name" {
   type        = string
 }
 
+variable "is_gcr_io_repo" {
+  description = "Flag to support gcr.io alphafold_components lecacy hosting"
+  type        = string
+}
+
 variable "filestore_instance_id" {
   description = "Filestore ID from Alphafold Inference Pipeline .tfvars file"
   type        = string

@@ -173,6 +173,10 @@ resource "google_cloud_run_v2_service" "alphafold_portal" {
         name  = "PREDICT_ACCELERATOR_COUNT"
         value = var.predict_accelerator_count
       }
+      env {
+        name  = "IS_GCR_IO_REPO"
+        value = var.is_gcr_io_repo
+      }
     }
   }
 }
