@@ -269,6 +269,8 @@ def decide_accelerator_type(machine_type):
         return "NVIDIA_TESLA_A100"
     elif machine_type.startswith("g"):
         return "NVIDIA_L4"
+    elif machine_type.startswith("n"):
+        return "NVIDIA_TESLA_T4"
     else:
         return "NVIDIA_L4"
 
@@ -357,11 +359,12 @@ def fold():
         pipeline_job.run(sync=False)
         pipeline_job.wait_for_resource_creation()
 
+
         # Log folding job
         message = f"Folding started for experiment ID {experiment_id} with parameters {params}"
         print(f'/fold MESAGE {message}')
         return Response("status: folding is in progress... }", 
-                        status=200,mimetype='application/json') 
+                        status=200,mimetype='application/json')
     else:
         return Response("{'status':'Unauthorized'}", status=401, mimetype='application/json')
 

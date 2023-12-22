@@ -126,7 +126,47 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
       });
   };
 
-  const handleCheckFasta = () => {
+  const countFastaResidue = (content: string | null) => {
+    let residue = 0;
+
+    // Split the text into lines.
+    if (content) {
+      const lines = content.split("\n");
+
+      // Iterate over the lines.
+      for (const line of lines) {
+        // Check if the line contains the ">" character.
+        if (!line.includes(">")) {
+          residue += line.length;
+        }
+      }
+    }
+    // Return the total count of remaining characters and the count of removed lines.
+    return residue;
+  };
+
+  const updateDefaultMachineSpec = (residueCount: number) => {
+    if (residueCount < 400) {
+      setPredictMachineType("n1-standard-8");
+      setRelaxMachineType("n1-standard-8");
+    } else if (residueCount < 800 && residueCount >= 400) {
+      setPredictMachineType("g2-standard-12");
+      setRelaxMachineType("g2-standard-12");
+    } else if (residueCount < 1200 && residueCount >= 800) {
+      setPredictMachineType("g2-standard-32");
+      setRelaxMachineType("g2-standard-32");
+    }
+    else if (residueCount < 2000 && residueCount >= 1200) {
+      setPredictMachineType("g2-standard-48");
+      setRelaxMachineType("g2-standard-48");
+    }
+    else {
+      setPredictMachineType("g2-standard-48");
+      setRelaxMachineType("g2-standard-48");
+    }
+  };
+
+  const handleCheckFasta = (fastaContent: string | null) => {
     if (!accessToken) {
       setSnackbarContent("AccessToken is missing. Please login first.");
       setOpen(true);
@@ -145,11 +185,13 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
         },
       })
       .then((res) => {
+        const residueCount = countFastaResidue(fastaContent);
         const protein = res.data.isMonomer ? "monomer" : "multimer";
         setProteinType(protein);
         setFastaCheckResult(
-          ` Protein Type: ${protein}. Residue: ${res.data.residue}`,
+          ` Protein Type: ${protein}. Residue: ${residueCount}`,
         );
+        updateDefaultMachineSpec(residueCount);
         setLoading(false);
       })
       .catch((error) => {
@@ -159,13 +201,6 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
         setLoading(false);
       });
   };
-
-  useEffect(() => {
-    if (file) {
-      handleCheckFasta();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [file]);
 
   const handleCancelJob = () => {
     onClose(false);
@@ -237,7 +272,7 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
                 reader.onload = () => {
                   setFile(file);
                   setFileName(file.name);
-                  handleCheckFasta();
+                  handleCheckFasta(reader.result?reader.result.toString():"");
                 };
                 if (file) {
                   reader.readAsText(file);
@@ -372,11 +407,14 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
                   size="small"
                   onChange={(e) => handleChange(e, setPredictMachineType)}
                 >
+                  <MenuItem value={"n1-standard-8"}>
+                    n1-standard-8 (T4)
+                  </MenuItem>
                   <MenuItem value={"g2-standard-8"}>
                     g2-standard-8 (L4)
                   </MenuItem>
-                  <MenuItem value={"g2-standard-16"}>
-                    g2-standard-16 (L4)
+                  <MenuItem value={"g2-standard-12"}>
+                    g2-standard-12 (L4)
                   </MenuItem>
                   <MenuItem value={"g2-standard-32"}>
                     g2-standard-32 (L4)
@@ -415,11 +453,14 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
                   size="small"
                   onChange={(e) => handleChange(e, setRelaxMachineType)}
                 >
+                  <MenuItem value={"n1-standard-8"}>
+                    n1-standard-8 (T4)
+                  </MenuItem>
                   <MenuItem value={"g2-standard-8"}>
                     g2-standard-8 (L4)
                   </MenuItem>
-                  <MenuItem value={"g2-standard-16"}>
-                    g2-standard-16 (L4)
+                  <MenuItem value={"g2-standard-12"}>
+                    g2-standard-12 (L4)
                   </MenuItem>
                   <MenuItem value={"g2-standard-32"}>
                     g2-standard-32 (L4)
