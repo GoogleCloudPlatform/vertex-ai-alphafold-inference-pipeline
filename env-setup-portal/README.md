@@ -56,7 +56,8 @@ gcs_bucket_name         = "<GCS_BUCKET_NAME>"
 ar_repo_name            = "<ARTIFACT_REGISTRY_REPO_NAME>"
 oauth2_client_id        = "<CLIENT_ID from OAuth Screen Setup>"
 oauth2_client_secret    = "<CLIENT_SECRET from OAuth Screen Setup>"
-flask_secret            = "<any random string, use https://www.uuidgenerator.net/guid"
+flask_secret            = "<any random string, use https://www.uuidgenerator.net/guid>"
+is_gcr_io_repo          = "<IS_GCR_IO_REPO true or false, true if you're using gcr.io>"
 ```
 
 ### Apply Terraform

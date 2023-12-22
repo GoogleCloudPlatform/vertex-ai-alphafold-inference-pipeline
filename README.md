@@ -142,7 +142,7 @@ Create the terraform variables file by making a copy from the template and set t
 - (Optional) `CLIENT_ID` from OAuth Consent Screen. Populate this value later when doing setup for Alphafold Portal
 - (Optional) `CLIENT_SECRET` from OAuth Consent Screen. Populate this value later when doing setup for Alphafold Portal
 - (Optional) `FLASK_SECRET` by generating random string. See [Generate Random UUID](https://www.uuidgenerator.net/). Populate this value later when doing setup for Alphafold Portal
-- 
+- (Optional) `IS_GCR_IO_REPO` "true" = Used gcr.io before, stick with it. "false" = New Alphafold setup, skip gcr.io for now. Populate this value later when doing setup for Alphafold Portal
 
 ```bash
 cp ${TERRAFORM_RUN_DIR}/terraform-sample.tfvars ${TERRAFORM_RUN_DIR}/terraform.tfvars

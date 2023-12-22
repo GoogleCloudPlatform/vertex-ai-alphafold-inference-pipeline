@@ -55,7 +55,7 @@ variable "ar_repo_name" {
 }
 
 variable "is_gcr_io_repo" {
-  description = "Flag to support gcr.io alphafold_components lecacy hosting"
+  description = "Flag to support gcr.io alphafold_components legacy hosting"
   type        = string
 }
 
