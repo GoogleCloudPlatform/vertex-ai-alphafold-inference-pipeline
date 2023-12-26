@@ -43,7 +43,6 @@ export default function JobResults(props: any) {
         accessorFn: (row: { experiment_id: any }) => `${row.experiment_id}`,
         id: "experiment_id",
         header: "Experiment ID",
-        enableGrouping: false,
         muiTableHeadCellProps: { sx: { color: "green" } },
         Cell: ({
           renderedCellValue,
@@ -52,7 +51,6 @@ export default function JobResults(props: any) {
           renderedCellValue: any;
           row: any;
         }) => {
-          console.log("WOR", row.original.url_link);
           return (
             <span>
               <a
@@ -69,12 +67,14 @@ export default function JobResults(props: any) {
       {
         accessorKey: "user",
         header: "User",
+        enableGrouping: false,
         muiTableHeadCellProps: { sx: { color: "green" } },
         Cell: ({ cell }: { cell: any }) => <span>{cell.getValue()}</span>,
       },
       {
         accessorKey: "status",
         header: "Status",
+        enableGrouping: false,
         muiTableHeadCellProps: { sx: { color: "green" } },
         Cell: ({ cell }: { cell: any }) => <span>{cell.getValue()}</span>,
       },
@@ -86,24 +86,41 @@ export default function JobResults(props: any) {
         Cell: ({ cell }: { cell: any }) => <span>{cell.getValue()}</span>,
       },
       {
+        accessorKey: "create_time",
+        header: "Created",
+        enableGrouping: false,
+        muiTableHeadCellProps: { sx: { color: "green" } },
+        Cell: ({ cell }: { cell: any }) => <span>{cell.getValue()}</span>,
+        sortingFn: (rowA : any, rowB : any, columnId : any) => {
+          return new Date(rowB.getValue(columnId)).getTime() - 
+            new Date(rowA.getValue(columnId)).getTime();
+        },
+      },
+      {
         accessorKey: "sequence",
         header: "Sequence",
-        enableGrouping: false,
         muiTableHeadCellProps: { sx: { color: "green" } },
         Cell: ({ cell }: { cell: any }) => <span>{cell.getValue()}</span>,
       },
       {
-        accessorKey: "top_predict_uri",
-        header: "TOP Predict URL",
+        accessorKey: "ranking_confidence",
+        header: "Accuracy",
+        enableGrouping: false,
+        muiTableHeadCellProps: { sx: { color: "green" } },
+        Cell: ({ cell }: { cell: any }) => <span>{reformatDigit(cell.getValue())}</span>,
+      },
+      {
+        accessorKey: "predict_uri",
+        header: "Predict URL",
         enableGrouping: false,
         muiTableHeadCellProps: { sx: { color: "green" } },
         Cell: ({ row }: { row: any }) => (
           <span>
-            {row.original.top_predict_uri === "NA" ? (
+            {row.original.predict_uri === "NA" ? (
               "NA"
             ) : (
               <a
-                href={row.original.top_relax_uri}
+                href={row.original.predict_uri}
                 target="_blank"
                 className="external-button"
               >
@@ -114,17 +131,17 @@ export default function JobResults(props: any) {
         ),
       },
       {
-        accessorKey: "top_relax_uri",
-        header: "Top Relax URL",
+        accessorKey: "relax_uri",
+        header: "Relax URL",
         enableGrouping: false,
         muiTableHeadCellProps: { sx: { color: "green" } },
         Cell: ({ row }: { row: any }) => (
           <span>
-            {row.original.top_relax_uri === "NA" ? (
+            {row.original.relax_uri === "NA" ? (
               "NA"
             ) : (
               <a
-                href={row.original.top_relax_uri}
+                href={row.original.relax_uri}
                 target="_blank"
                 className="external-button"
               >
@@ -141,6 +158,10 @@ export default function JobResults(props: any) {
   //optionally, you can manage any/all of the table state yourself
   const [rowSelection, setRowSelection] = useState({});
 
+  const reformatDigit = (value: any) => {
+    return value != "NA" ? value.toFixed(2) : 0;
+  };
+
   useEffect(() => {
     //do something when the row selection changes
   }, [rowSelection]);
@@ -149,13 +170,22 @@ export default function JobResults(props: any) {
     columns,
     data,
     enableGrouping: true,
-    enableColumnOrdering: true, //enable some features
+    enableColumnDragging: false, //enable some features
     // enableRowSelection: true,
     enablePagination: false, //disable a default feature
     onRowSelectionChange: setRowSelection, //hoist internal state to your own state (optional)
     // state: { rowSelection,  }, //manage your own state, pass it back to the table (optional)
     state: { isLoading: loading },
-    initialState: { grouping: ["run_tag"] },
+    initialState: {
+      grouping: ["run_tag", "experiment_id","sequence"],
+      density: "compact",
+      sorting: [
+        { id: "create_time", desc: true },
+        { id: "ranking_confidence", desc: true }],
+      columnVisibility: {
+        create_time: false,
+      }
+    },
   });
 
   return (

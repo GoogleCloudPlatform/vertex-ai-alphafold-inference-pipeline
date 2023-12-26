@@ -147,60 +147,55 @@ def get_clientid():
     return f'{os.environ.get("OAUTH2_CLIENT_ID")}'
 
 def reformatBucketUri(gcs_uri):
-    if gcs_uri is None:
+    if gcs_uri is None or gcs_uri == "NA":
         return "NA"
     folder = gcs_uri.replace("gs://","")
     folder = re.sub('[\w-]+\.[a-z]*', '', folder)
     return f'https://console.cloud.google.com/storage/browser/{folder}'
 
-def extract_best_prediction_relaxation_url(_pipe, _client_pipeline, _status):
+def extract_prediction_relaxation_tasks(_pipe, _client_pipeline):
     get_request = vertex_ai2.GetPipelineJobRequest(name=_pipe.name) # pipe.name = pipeline ID
     pipeline_job = _client_pipeline.get_pipeline_job(get_request)
+    # predict_tasks = [i for i in pipeline_job.job_detail.task_details]
     predict_tasks = [i for i in pipeline_job.job_detail.task_details if i.task_name == 'predict']
+    potential_relax_tasks = [i for i in pipeline_job.job_detail.task_details if 'condition' in i.task_name]
 
-    formated_predict_tasks = []
+    formatted_predict_relax_tasks = []
 
-    for t in predict_tasks:
-        task_id = t.task_id
-        parent_task_id = t.parent_task_id
-        model_name = t.execution.metadata['input:model_name']
-        ranking_confidence = 0 if t.outputs["raw_prediction"].artifacts[0].metadata.get("ranking_confidence") == None else t.outputs['raw_prediction'].artifacts[0].metadata['ranking_confidence']
-        uri = t.outputs['raw_prediction'].artifacts[0].uri
+    for predictTask in predict_tasks:
+        task_id = predictTask.task_id
+        parent_task_id = predictTask.parent_task_id
+        model_name = predictTask.execution.metadata['input:model_name']
+        ranking_confidence = 0 if predictTask.outputs["raw_prediction"].artifacts[0].metadata.get("ranking_confidence") == None \
+            else predictTask.outputs['raw_prediction'].artifacts[0].metadata['ranking_confidence']
+        predict_uri = predictTask.outputs['raw_prediction'].artifacts[0].uri
 
-        formated_predict_tasks.append(
+        # Get relaxation
+        relax_parent_id = None
+        relax_uri = None
+        for relaxTask in potential_relax_tasks:
+            if relaxTask.parent_task_id == predictTask.parent_task_id:
+                relax_parent_id = relaxTask.parent_task_id
+                break
+
+        for t2 in pipeline_job.job_detail.task_details:
+            if t2.parent_task_id == relax_parent_id:
+                relax_uri = t2.outputs['relaxed_protein'].artifacts[0].uri \
+                    if 'relaxed_protein' in t2.outputs else None
+                break
+
+        formatted_predict_relax_tasks.append(
             {
                 'task_id': task_id,
+                'task_name': predictTask.task_name,
                 'parent_task_id': parent_task_id,
                 'model_name': model_name,
                 'ranking_confidence': ranking_confidence,
-                'uri': uri
+                'predict_uri': reformatBucketUri(predict_uri),
+                'relax_uri': reformatBucketUri(relax_uri)
             }
         )
-
-    # Sort predict tasks by ranking confidence
-    sorted_predict = sorted(formated_predict_tasks, key=lambda x: x['ranking_confidence'], reverse=True)
-
-    top_predict_uri = None
-    top_relax_uri = None
-
-    if _status != "RUNNING":
-        # Get top prediction
-        if len(sorted_predict) > 0:
-            top_predict_uri = None if sorted_predict[0].get("uri") == None else sorted_predict[0]["uri"]
-            top_predict_uri = top_predict_uri if ".pkl" in top_predict_uri else None
-
-            # Get top relaxation
-            condition_relax_parent_id = None
-            for t in pipeline_job.job_detail.task_details:
-                if t.parent_task_id == sorted_predict[0]['parent_task_id'] and 'condition' in t.task_name:
-                    condition_relax_parent_id = t.task_id
-                    break
-            for t in pipeline_job.job_detail.task_details:
-                if t.parent_task_id == condition_relax_parent_id:
-                    top_relax_uri = t.outputs['relaxed_protein'].artifacts[0].uri
-                    break
-
-    return [reformatBucketUri(top_predict_uri), reformatBucketUri(top_relax_uri)]
+    return formatted_predict_relax_tasks
 
 @app.route("/status", methods=['GET'])
 def get_dashboarddata():
@@ -221,8 +216,6 @@ def get_dashboarddata():
             url_link = formatUrlLink(pipe.name, REGION, PROJECT_ID)
             url_all_structures = formatUrlAllStructures(pipe.name, BUCKET_NAME, labels['experiment_id'], PROJECT_NUMBER)
 
-            # Extract metadata about prediction ranking (best)
-            predict_relax_uri = extract_best_prediction_relaxation_url(pipe, client_pipeline, status)
             if pipe.end_time:
                 duration = pipe.end_time - ( pipe.end_time if pipe.start_time is None else pipe.start_time)
             else:
@@ -233,19 +226,41 @@ def get_dashboarddata():
             minutes = int((seconds % 3600) // 60)
             seconds = seconds % 60
             ti = f'{hours}h{minutes}m'
-            p_data ={
-                "run_tag": labels['run_tag'],
-                "experiment_id":labels['experiment_id'],
-                "sequence":labels['sequence_id'],
-                "status":status,
-                "duration":ti,
-                "url_link": url_link,
-                "url_all_structures": url_all_structures,
-                "top_predict_uri": predict_relax_uri[0], # first index is predict URL
-                "top_relax_uri": predict_relax_uri[1],
-                "user": labels['user']
-            }
-            running_pp.append(p_data)
+
+            # Extract each prediction and its associated relaxation tasks
+            if status != "RUNNING":
+                predict_relax_tasks = extract_prediction_relaxation_tasks(pipe, client_pipeline)
+                for task in predict_relax_tasks:
+                    p_data ={
+                        "run_tag": labels['run_tag'],
+                        "experiment_id":labels['experiment_id'],
+                        "sequence":labels['sequence_id'],
+                        "status":status,
+                        "duration":ti,
+                        "url_link": url_link,
+                        "url_all_structures": url_all_structures,
+                        "predict_uri": task["predict_uri"],
+                        "relax_uri": task["relax_uri"],
+                        "ranking_confidence": task["ranking_confidence"],
+                        "user": labels['user'],
+                        "create_time": 0 if pipe.create_time is None else pipe.create_time,
+                    }
+                    running_pp.append(p_data)
+            else:
+                p_data ={
+                        "run_tag": labels['run_tag'],
+                        "experiment_id":labels['experiment_id'],
+                        "sequence":labels['sequence_id'],
+                        "status":status,
+                        "duration":ti,
+                        "url_link": url_link,
+                        "url_all_structures": url_all_structures,
+                        "predict_uri": "NA",
+                        "relax_uri": "NA",
+                        "ranking_confidence": "NA",
+                        "user": labels['user']
+                    }
+                running_pp.append(p_data)
         return jsonify(running_pp)
     else:
         return Response("{'status':'Unauthorized'}", status=401, mimetype='application/json')

@@ -70,3 +70,8 @@ button:focus-visible {
   padding: 0.5rem;
   text-decoration: none;
 }
+
+td, th {
+  min-width: unset!important;
+  width: auto!important;
+}
