@@ -36,7 +36,7 @@ import {
   AccordionDetails,
 } from "@mui/material";
 import axios from "axios";
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext } from "react";
 import { globalContext } from "./App";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { calculateAcceleratorCount } from "./common/CommonFunctions";
