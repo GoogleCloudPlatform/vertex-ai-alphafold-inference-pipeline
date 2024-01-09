@@ -69,7 +69,7 @@ resource "google_project_iam_member" "assign_sa_roles" {
 }
 
 locals {
-  service_image_tag = "${var.region}-docker.pkg.dev/${var.project_id}/${var.ar_repo_name}/${var.cloud_run_service_name}:latest" 
+  service_image_tag = var.is_gcr_io_repo == "true" ? "gcr.io/${var.project_id}/alphafold-components" : "${var.region}-docker.pkg.dev/${var.project_id}/${var.ar_repo_name}/${var.cloud_run_service_name}:latest" 
 }
 
 ## Provide Cloud Build Service Account AR write Access
