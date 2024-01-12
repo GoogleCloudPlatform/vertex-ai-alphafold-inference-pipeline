@@ -21,7 +21,7 @@ from src.components import  configure_run as ConfigureRunOp
 from src.components import  data_pipeline
 from src.components import  predict as PredictOp
 from src.components import  relax as RelaxOp
-
+import os
 
 DataPipelineOp = create_custom_training_job_from_component(
     data_pipeline,
@@ -37,17 +37,17 @@ DataPipelineOp = create_custom_training_job_from_component(
 JobPredictOp = create_custom_training_job_from_component(
     PredictOp,
     display_name = 'Predict',
-    machine_type = config.PREDICT_MACHINE_TYPE,
-    accelerator_type = config.PREDICT_ACCELERATOR_TYPE,
-    accelerator_count = config.PREDICT_ACCELERATOR_COUNT
+    machine_type = os.environ['PREDICT_MACHINE_TYPE'],
+    accelerator_type = os.environ['PREDICT_ACCELERATOR_TYPE'],
+    accelerator_count = os.environ['PREDICT_ACCELERATOR_COUNT']
 )
 
 JobRelaxOp = create_custom_training_job_from_component(
     RelaxOp,
     display_name = 'Relax',
-    machine_type = config.RELAX_MACHINE_TYPE,
-    accelerator_type = config.RELAX_ACCELERATOR_TYPE,
-    accelerator_count = config.RELAX_ACCELERATOR_COUNT
+    machine_type = os.environ['RELAX_MACHINE_TYPE'],
+    accelerator_type = os.environ['RELAX_ACCELERATOR_TYPE'],
+    accelerator_count = os.environ['RELAX_ACCELERATOR_COUNT']
 )
 
 @dsl.pipeline(

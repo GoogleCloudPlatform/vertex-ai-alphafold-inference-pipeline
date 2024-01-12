@@ -1,0 +1,11 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'build',
+          '.',
+          '-f',
+          './Alphafold2.dockerfile',
+          '-t',
+          '${_CONTAINER_IMAGE_TAG}'
+  ]
+images:
+- '${_CONTAINER_IMAGE_TAG}'

@@ -3,8 +3,8 @@
 # Build UI components
 FROM node:18 AS build-ui-server
 WORKDIR /app
-COPY /frontend/package.json ./frontend/package.json
-COPY . .
+COPY src/frontend/package.json ./frontend/package.json
+COPY src .
 ### Build React UI Artifacts
 WORKDIR /app/frontend
 RUN yarn
@@ -25,7 +25,7 @@ ENV PYTHONUNBUFFERED True
 # Assuming gcloud build is run 1 directory above Dockerfile.
 ENV APP_HOME /app
 WORKDIR $APP_HOME
-COPY . .
+COPY src .
 
 ### Copy UI Artefacts from UI build to backend static hosting folder
 COPY --from=build-ui-server /app/frontend/dist /app/backend/static

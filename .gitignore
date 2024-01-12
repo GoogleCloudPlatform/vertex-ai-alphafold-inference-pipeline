@@ -192,6 +192,3 @@ env.sh
 # IntelliJ IDEA files
 *.iml
 .idea
-
-# Kubeflow Pipelines YAML files
-*.yaml

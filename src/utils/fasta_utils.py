@@ -17,7 +17,6 @@
 from Bio import SeqIO
 from typing import Dict, Union
 
-
 def validate_fasta_file(
     file_path: str
 ) -> Union[bool, Dict[int, int]]:

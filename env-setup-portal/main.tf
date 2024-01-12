@@ -91,21 +91,13 @@ resource "null_resource" "build_alphafold_portal_cr_image" {
   provisioner "local-exec" {
     when    = create
     command = <<-EOT
+      cd ..
       gcloud builds submit . \
       --region=${var.region} \
       --project=${var.project_id} \
-      --config=alphafold-cloudbuild.yml \
+      --config=alphafold-portal.yml \
       --substitutions=_CONTAINER_IMAGE_TAG=${local.service_image_tag} \
       --ignore-file=./.dockerignore
-      EOT
-  }
-
-  provisioner "local-exec" {
-    when    = destroy
-    command = <<-EOT
-      gcloud artifacts docker images delete \
-      ${self.triggers.full_image_path} \
-      --quiet
       EOT
   }
 }

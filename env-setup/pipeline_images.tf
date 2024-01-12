@@ -35,13 +35,17 @@ resource "null_resource" "pipeline_images2" {
   provisioner "local-exec" {
     when    = create
     command = <<-EOT
-      cd ..
-      gcloud builds submit --timeout "2h" --tag ${self.triggers.full_image_path} . --machine-type=e2-highcpu-8
-      gcloud -q container images add-tag ${self.triggers.full_image_path}:latest ${self.triggers.full_image_path}:cuda-1180
-      cp Dockerfile Dockerfile_bak
-      cp Dockerfile_cuda1111 Dockerfile
-      gcloud builds submit --timeout "2h" --tag ${self.triggers.full_image_path}:cuda-1111 . --machine-type=e2-highcpu-8
-      mv Dockerfile_bak Dockerfile
+      gcloud builds submit --timeout "2h" \
+      --config=../Alphafold1.dockerfile \
+      --tag ${self.triggers.full_image_path} . \ 
+      --machine-type=e2-highcpu-8
+      gcloud -q container images add-tag ${self.triggers.full_image_path}:latest \
+      ${self.triggers.full_image_path}:cuda-1180
+
+      gcloud builds submit --timeout "2h" \
+      --config=../Alphafold1.dockerfile_cuda1111 \
+      --tag ${self.triggers.full_image_path}:cuda-1111 . \ 
+      --machine-type=e2-highcpu-8
       EOT
   }
 

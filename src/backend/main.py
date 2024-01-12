@@ -33,8 +33,8 @@ from kfp.v2 import compiler
 import sys
 
 sys.path.append('..')
-from src.utils import fasta_utils
-from src.utils import compile_utils
+from utils import fasta_utils
+from utils import compile_utils
 
 # Basic running parameters
 PROJECT_ID = os.environ.get("PROJECT_ID")  # Change to your project ID
