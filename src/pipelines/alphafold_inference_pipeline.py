@@ -16,11 +16,14 @@
 
 from google_cloud_pipeline_components.v1.custom_job import create_custom_training_job_from_component
 from kfp.v2 import dsl
-from src import config
-from src.components import  configure_run as ConfigureRunOp
-from src.components import  data_pipeline
-from src.components import  predict as PredictOp
-from src.components import  relax as RelaxOp
+import sys
+sys.path.append('..')
+
+import config
+from components import configure_run as ConfigureRunOp
+from components import data_pipeline
+from components import predict as PredictOp
+from components import relax as RelaxOp
 import os
 
 DataPipelineOp = create_custom_training_job_from_component(
@@ -37,17 +40,17 @@ DataPipelineOp = create_custom_training_job_from_component(
 JobPredictOp = create_custom_training_job_from_component(
     PredictOp,
     display_name = 'Predict',
-    machine_type = os.environ['PREDICT_MACHINE_TYPE'],
-    accelerator_type = os.environ['PREDICT_ACCELERATOR_TYPE'],
-    accelerator_count = os.environ['PREDICT_ACCELERATOR_COUNT']
+    machine_type = 'g2-standard-12' if os.environ['PREDICT_MACHINE_TYPE'] is None else os.environ['PREDICT_MACHINE_TYPE'],
+    accelerator_type = 'NVIDIA_L4' if os.environ['PREDICT_ACCELERATOR_TYPE'] is None else os.environ['PREDICT_ACCELERATOR_TYPE'],
+    accelerator_count = '1' if os.environ['PREDICT_ACCELERATOR_COUNT'] is None else os.environ['PREDICT_ACCELERATOR_COUNT']
 )
 
 JobRelaxOp = create_custom_training_job_from_component(
     RelaxOp,
     display_name = 'Relax',
-    machine_type = os.environ['RELAX_MACHINE_TYPE'],
-    accelerator_type = os.environ['RELAX_ACCELERATOR_TYPE'],
-    accelerator_count = os.environ['RELAX_ACCELERATOR_COUNT']
+    machine_type = 'g2-standard-12' if os.environ['RELAX_MACHINE_TYPE'] is None else os.environ['RELAX_MACHINE_TYPE'],
+    accelerator_type = 'NVIDIA_L4' if os.environ['RELAX_ACCELERATOR_TYPE'] is None else os.environ['RELAX_ACCELERATOR_TYPE'],
+    accelerator_count = '1' if os.environ['RELAX_ACCELERATOR_COUNT'] is None else os.environ['RELAX_ACCELERATOR_COUNT']
 )
 
 @dsl.pipeline(

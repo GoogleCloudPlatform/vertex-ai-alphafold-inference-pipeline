@@ -15,14 +15,17 @@
 
 from google_cloud_pipeline_components.v1.custom_job import create_custom_training_job_from_component
 from kfp.v2 import dsl
-from src import config
-from src.components import aggregate_features as AggregateOp
-from src.components import configure_run as ConfigureRunOp
-from src.components import hhblits
-from src.components import hhsearch
-from src.components import jackhmmer
-from src.components import predict as PredictOp
-from src.components import relax as RelaxOp
+import sys
+sys.path.append('..')
+
+import config
+from components import aggregate_features as AggregateOp
+from components import configure_run as ConfigureRunOp
+from components import hhblits
+from components import hhsearch
+from components import jackhmmer
+from components import predict as PredictOp
+from components import relax as RelaxOp
 
 
 JackhmmerOp = create_custom_training_job_from_component(

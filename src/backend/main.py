@@ -30,11 +30,11 @@ from google.cloud import storage
 from flask_cors import CORS
 import jwt
 from kfp.v2 import compiler
-import sys
 
+import sys
 sys.path.append('..')
-from utils import fasta_utils
-from utils import compile_utils
+import utils.fasta_utils as fasta_utils
+import utils.compile_utils as compile_utils
 
 # Basic running parameters
 PROJECT_ID = os.environ.get("PROJECT_ID")  # Change to your project ID
@@ -350,7 +350,7 @@ def fold():
         os.environ['PARALLELISM'] = '5'
         
         # Compile the pipeline
-        from src.pipelines.alphafold_inference_pipeline import alphafold_inference_pipeline as pipeline
+        from pipelines.alphafold_inference_pipeline import alphafold_inference_pipeline as pipeline
         run_tag = str(form["runTag"]).lower()
         experiment_id = str(form["experimentId"]).lower()
         pipeline_name = f'universal-pipeline-{experiment_id}'

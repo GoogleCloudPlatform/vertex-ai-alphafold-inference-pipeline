@@ -17,8 +17,9 @@ from kfp.v2 import dsl
 from kfp.v2.dsl import Artifact
 from kfp.v2.dsl import Input
 from kfp.v2.dsl import Output
-
-from src import config
+import sys
+sys.path.append('..')
+import config
 
 
 @dsl.component(
