@@ -21,8 +21,28 @@ resource "google_artifact_registry_repository" "alphafold_components" {
   format        = "DOCKER"
   description   = "Alphafold Components kfp image"
 }
+resource "null_resource" "pipeline_images1" {
+  depends_on = [
+    google_artifact_registry_repository.alphafold_components
+  ]
 
+  triggers = {
+    full_image_path = "${var.region}-docker.pkg.dev/${var.project_id}/${var.ar_repo_name}/alphafold-components"
+  }
 
+  provisioner "local-exec" {
+    when    = create
+    command = <<-EOT
+      cd ..
+      gcloud builds submit . --timeout "2h" \
+      --region=${var.region} \
+      --project=${var.project_id} \
+      --config=alphafold.yml \
+      --substitutions=_CONTAINER_IMAGE_TAG=${self.triggers.full_image_path} \
+      --machine-type=e2-highcpu-8 --async
+      EOT
+  }
+}
 resource "null_resource" "pipeline_images2" {
   depends_on = [
     google_artifact_registry_repository.alphafold_components
@@ -35,26 +55,13 @@ resource "null_resource" "pipeline_images2" {
   provisioner "local-exec" {
     when    = create
     command = <<-EOT
-      gcloud builds submit --timeout "2h" \
-      --config=../Alphafold1.dockerfile \
-      --tag ${self.triggers.full_image_path} . \ 
-      --machine-type=e2-highcpu-8
-      gcloud -q container images add-tag ${self.triggers.full_image_path}:latest \
-      ${self.triggers.full_image_path}:cuda-1180
-
-      gcloud builds submit --timeout "2h" \
-      --config=../Alphafold1.dockerfile_cuda1111 \
-      --tag ${self.triggers.full_image_path}:cuda-1111 . \ 
-      --machine-type=e2-highcpu-8
-      EOT
-  }
-
-  provisioner "local-exec" {
-    when    = destroy
-    command = <<-EOT
-      gcloud artifacts docker images delete \
-      ${self.triggers.full_image_path} \
-      --quiet
+      cd ..
+      gcloud builds submit . --timeout "2h" \
+      --region=${var.region} \
+      --project=${var.project_id} \
+      --config=alphafold-cuda1111.yml \
+      --substitutions=_CONTAINER_IMAGE_TAG=${self.triggers.full_image_path} \
+      --machine-type=e2-highcpu-8  --async
       EOT
   }
 }

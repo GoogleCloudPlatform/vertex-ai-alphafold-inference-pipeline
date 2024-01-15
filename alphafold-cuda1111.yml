@@ -1,0 +1,11 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'build',
+          '.',
+          '-f',
+          './Alphafold1.dockerfile_cuda1111',
+          '-t',
+          '${_CONTAINER_IMAGE_TAG}:cuda-1111'
+  ]
+images:
+- '${_CONTAINER_IMAGE_TAG}:cuda-1111'
