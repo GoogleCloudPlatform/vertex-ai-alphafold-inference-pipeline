@@ -1,4 +1,4 @@
-# Copyright 2022 Google LLC
+# Copyright 2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -77,9 +77,19 @@ def upload_to_bucket(blob_name, the_file, bucket_name):
         return f'gs://{BUCKET_NAME}/{blob_name}'
     except Exception as e:
         return f'FAILED to upload fasta file to GCS Bucket.\n{e}'
-    
 
-app = Flask(__name__)
+def download_file(blob_name: str) -> bytes:
+    bucket = storage_client.bucket(BUCKET_NAME)
+    blob = bucket.blob(blob_name)
+    print(f'Blob: {blob}')
+    if blob.exists():
+        return blob.download_as_bytes()
+    else:
+        print(f"[Warning]{blob_name} does not exists")
+        return None
+
+
+app = Flask(__name__, static_url_path='/static')
 CORS(app)
 
 appConf = {
@@ -104,10 +114,19 @@ message = "" # global retun message
 
 """API Endpoints serving Alphafold UI Portal."""
 
+@app.route("/protein", methods=['GET'])
+def view_protein():
+    PREFIX = 'https://console.cloud.google.com/storage/browser/' + BUCKET_NAME + '/'
+    path = request.args.get('path')
+    pdb = download_file(path[len(PREFIX):])
+    return pdb
+
 @app.route("/", methods=['POST', 'GET'])
 def AFportal():
     # Default static hosting that points to React's output
     return render_template('index.html')
+
+
 
 @app.route("/check-fasta", methods=['POST'])
 def check_fasta():

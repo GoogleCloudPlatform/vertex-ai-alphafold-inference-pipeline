@@ -69,7 +69,13 @@ button:focus-visible {
   max-width: 9ch;
   padding: 0.5rem;
   text-decoration: none;
+  cursor: pointer;
 }
+
+.external-button:hover {
+  background-color: #ff6d00;
+}
+
 
 td, th {
   min-width: unset!important;

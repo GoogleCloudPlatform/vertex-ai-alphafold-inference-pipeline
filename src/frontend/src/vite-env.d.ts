@@ -110,5 +110,14 @@ interface Window {
       };
       oauth2: any;
     };
-  };
+  },
+  $3Dmol?: {
+    createViewer: (any, any) => {
+      addModel: any,
+      setStyle: any,
+      zoomTo: any,
+      render: any,
+      zoom: any,
+    },
+  }
 }
