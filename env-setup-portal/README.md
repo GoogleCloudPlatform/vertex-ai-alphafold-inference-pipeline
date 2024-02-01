@@ -38,27 +38,30 @@
 
 ### Populate terraform.tfvars File Default Values
 
-Assuming the copy of the repo is at `~/vertex-ai-alphafold-inference-pipeline/`, copy the terraform.tfvars from env-setup/ folder to env-setup-portal/ folder:
+Create the Terraform variables file by making a copy from the template and set the Terraform variables:
 
 ```
-cp ~/vertex-ai-alphafold-inference-pipeline/env-setup/terraform.tfvars ~/vertex-ai-alphafold-inference-pipeline/env-setup-portal
 cd ~/vertex-ai-alphafold-inference-pipeline/env-setup-portal
+cp terraform-sample.tfvars terraform.tfvars
 ```
 
 Make sure the copied or the newly generated terraform.tfvars file contains minmimally these variables:
 
-```
-project_id              = "<PROJECT_ID>"
-region                  = "<REGION>"
-zone                    = "<ZONE>"
-filestore_instance_id   = "<FILESTORE_INSTANCE_ID>"
-gcs_bucket_name         = "<GCS_BUCKET_NAME>"
-ar_repo_name            = "<ARTIFACT_REGISTRY_REPO_NAME>"
-oauth2_client_id        = "<CLIENT_ID from OAuth Screen Setup>"
-oauth2_client_secret    = "<CLIENT_SECRET from OAuth Screen Setup>"
-flask_secret            = "<any random string, use https://www.uuidgenerator.net/guid>"
-is_gcr_io_repo          = "<IS_GCR_IO_REPO true or false, true if you're using gcr.io>"
-```
+- `<PROJECT_ID>` - your GCP project id
+- `<PROJECT_NUMBER>` - your GCP project number
+- `<REGION>` - your compute region for the Filestore and Vertex Workbench Instance
+- `<ZONE>` - your compute zone
+- `<NETWORK_NAME>` - the name for the VPC network
+- `<SUBNET_NAME>` - the name for the VPC network
+- `<WORKBENCH_INSTANCE_NAME>` - the name for the Vertex Workbench instance, ex: alpha-wb
+- `<FILESTORE_INSTANCE_ID>` - the instance ID of the Filestore instance. See [Naming your instance](https://cloud.google.com/filestore/docs/creating-instances#naming_your_instance). Example: `alphaf-nfs`
+- `<GCS_BUCKET_NAME>` - the name of the GCS regional bucket. See [Bucket naming guidelines](https://cloud.google.com/storage/docs/naming-buckets)
+- `<GCS_DBS_PATH>` - the path to the GCS location of the genetic databases and model parameters.
+- `<ARTIFACT_REGISTRY_REPO_NAME>` - the Artifact Registry repository name to upload pipeline images images. Example: `alphaf-kfp`
+- `<CLIENT_ID>` from OAuth Consent Screen.
+- `<CLIENT_SECRET>` from OAuth Consent Screen.
+- `<FLASK_SECRET>` by generating random string. See [Generate Random UUID](https://www.uuidgenerator.net/).
+- `<IS_GCR_IO_REPO>` "true" means you've used gcr.io before or have existing Alphafold Vertex Pipeline set up, stick with it. "false" means you're using new Alphafold Vertex Pipeline setup (after Jan 2024), skip gcr.io for now.
 
 ### Apply Terraform
 

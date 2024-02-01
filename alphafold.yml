@@ -3,7 +3,7 @@ steps:
   args: [ 'build',
           '.',
           '-f',
-          './Alphafold1.dockerfile',
+          './Alphafold.dockerfile',
           '-t',
           '${_CONTAINER_IMAGE_TAG}',
           '-t',

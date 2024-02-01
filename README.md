@@ -138,13 +138,13 @@ Create the terraform variables file by making a copy from the template and set t
 - `<SUBNET_NAME>` - the name for the VPC network
 - `<WORKBENCH_INSTANCE_NAME>` - the name for the Vertex Workbench instance, ex: alpha-wb
 - `<FILESTORE_INSTANCE_ID>` - the instance ID of the Filestore instance. See [Naming your instance](https://cloud.google.com/filestore/docs/creating-instances#naming_your_instance). Example: `alphaf-nfs`
-- `<GCS_BUCKET_NAME>` - the name of the GCS regional bucket. See [Bucket naming guidelines](https://cloud.google.com/storage/docs/naming-buckets) 
-- `<GCS_DBS_PATH>` - the path to the GCS location of the genetic databases and model parameters. 
+- `<GCS_BUCKET_NAME>` - the name of the GCS regional bucket. See [Bucket naming guidelines](https://cloud.google.com/storage/docs/naming-buckets)
+- `<GCS_DBS_PATH>` - the path to the GCS location of the genetic databases and model parameters.
 - `<ARTIFACT_REGISTRY_REPO_NAME>` - the Artifact Registry repository name to upload pipeline images images. Example: `alphaf-kfp`
 - (Optional) `CLIENT_ID` from OAuth Consent Screen. Populate this value later when doing setup for Alphafold Portal
 - (Optional) `CLIENT_SECRET` from OAuth Consent Screen. Populate this value later when doing setup for Alphafold Portal
 - (Optional) `FLASK_SECRET` by generating random string. See [Generate Random UUID](https://www.uuidgenerator.net/). Populate this value later when doing setup for Alphafold Portal
-- (Optional) `IS_GCR_IO_REPO` "true" = Used gcr.io before or have existing Alphafold Pipeline set up, stick with it. "false" = New Alphafold Pipeline setup, skip gcr.io for now. Populate this value later when doing setup for Alphafold Portal
+- (Optional) `IS_GCR_IO_REPO` "true" means you've used gcr.io before or have existing Alphafold Pipeline set up, stick with it. "false" means you're using new Alphafold Pipeline setup, skip gcr.io for now. Populate this value later when doing setup for Alphafold Portal
 
 ```bash
 cp ${TERRAFORM_RUN_DIR}/terraform-sample.tfvars ${TERRAFORM_RUN_DIR}/terraform.tfvars
