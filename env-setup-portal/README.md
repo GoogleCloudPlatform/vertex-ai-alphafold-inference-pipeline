@@ -1,5 +1,5 @@
 ## Prerequisites
-   In order to install Alphafold Portal, setup Alphafold Inference Pipeline first. Refer to the installation guide: https://github.com/GoogleCloudPlatform/vertex-ai-alphafold-inference-pipeline/blob/main/README.md
+   In order to install Alphafold Portal, setup Alphafold Inference Pipeline first. Refer to the [installation guide](https://github.com/GoogleCloudPlatform/vertex-ai-alphafold-inference-pipeline/blob/main/README.md).
 
    This guide assumes that Artifact Registry repository from the above tutorial has been setup. The location should follow this format:
    
