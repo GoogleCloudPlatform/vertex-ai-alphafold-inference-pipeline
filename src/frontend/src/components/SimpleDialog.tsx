@@ -1,7 +1,25 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import { useEffect, createRef } from 'react';
 import axios from 'axios';
+import InfoIcon from '@mui/icons-material/Info';
+import Tooltip from '@mui/material/Tooltip';
 
 export interface SimpleDialogProps {
     open: boolean;
@@ -50,7 +68,12 @@ export default function SimpleDialog(props: SimpleDialogProps) {
             open={open}
             fullWidth={true}
             maxWidth={'md'}>
-            <DialogTitle>Protein Viewer</DialogTitle>
+            <DialogTitle>
+                Protein Viewer
+                <Tooltip style={{ marginLeft: '0.5rem' }} title='Protein viewer library by Koes, D., & Rego, N. 3Dmol.js: molecular visualization with WebGL [Computer software]. https://github.com/3dmol/3Dmol.js'>
+                    <InfoIcon />
+                </Tooltip>
+            </DialogTitle>
             <div>
                 <div
                     id='proteinViewer'

@@ -4,6 +4,8 @@ This repository compiles prescriptive guidance and code samples demonstrating ho
 
 Code sample base on v2.3.1 of AlphaFold.
 
+For protein viewer in Alphafold Portal we're using 3Dmol CDN binary which licensed under BSD 3-Clause License.
+
 ## Solutions architecture overview
 
 The following diagram depicts the architecture of the solution.
