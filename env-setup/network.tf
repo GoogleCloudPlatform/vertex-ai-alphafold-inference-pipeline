@@ -16,6 +16,7 @@ resource "google_compute_network" "network" {
   name                    = var.network_name
   auto_create_subnetworks = "false"
   routing_mode            = "REGIONAL"
+  depends_on  = [google_project_service.enable_required_services]
 }
 
 resource "google_compute_subnetwork" "subnetwork" {

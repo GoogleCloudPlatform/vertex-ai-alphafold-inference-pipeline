@@ -21,7 +21,9 @@ from kfp.v2.dsl import Input
 from kfp.v2.dsl import Output
 from typing import List
 
-from src import config
+import sys
+sys.path.append('..')
+import config
 
 
 @dsl.component(

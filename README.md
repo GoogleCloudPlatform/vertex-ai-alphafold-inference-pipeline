@@ -4,6 +4,10 @@ This repository compiles prescriptive guidance and code samples demonstrating ho
 
 Code sample base on v2.3.2 of AlphaFold.
 
+For protein viewer in Alphafold Portal we're using 3Dmol CDN binary which licensed under BSD 3-Clause License.
+
+Note: Alphafold Portal README will be available in the same repository [here](https://github.com/GoogleCloudPlatform/vertex-ai-alphafold-inference-pipeline/blob/alphafold-portal/env-setup-portal/README.md).
+
 ## Solutions architecture overview
 
 The following diagram depicts the architecture of the solution.
@@ -104,35 +108,15 @@ You will be using [Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-
 
 In the Google Cloud Console, navigate to your project and open [Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-shell). ***Make sure you have Owner privileges***.
 
-### Step 2 - Enable the required services
+### Step 2 - Setup environment variables
 
-Run the following commands to enable the required services.
+Run the following commands to setup environment variables.
 
 ```bash
 export PROJECT_ID=<YOUR PROJECT ID>
-
-gcloud config set project $PROJECT_ID
-
-gcloud services enable \
-cloudbuild.googleapis.com \
-compute.googleapis.com \
-cloudresourcemanager.googleapis.com \
-iam.googleapis.com \
-container.googleapis.com \
-cloudtrace.googleapis.com \
-iamcredentials.googleapis.com \
-monitoring.googleapis.com \
-logging.googleapis.com \
-notebooks.googleapis.com \
-aiplatform.googleapis.com \
-file.googleapis.com \
-servicenetworking.googleapis.com
-
 ```
 
-
 ### Step 3 - Apply the Terraform configuration
-
 
 First, clone the repo and prepare environment variables.
 
@@ -149,14 +133,20 @@ cd ${TERRAFORM_RUN_DIR}
 Create the terraform variables file by making a copy from the template and set the terraform variables that reflect your environment. The sample file has all the required variables listed. The variables are defined as follows.
 
 - `<PROJECT_ID>` - your GCP project id
+- `<PROJECT_NUMBER>` - your GCP project number
 - `<REGION>` - your compute region for the Filestore and Vertex Workbench Instance
 - `<ZONE>` - your compute zone
 - `<NETWORK_NAME>` - the name for the VPC network
 - `<SUBNET_NAME>` - the name for the VPC network
-- `<WORKBENCH_INSTANCE_NAME>` - the name for the Vertex Workbench instance
-- `<FILESTORE_INSTANCE_ID>` - the instance ID of the Filestore instance. See [Naming your instance](https://cloud.google.com/filestore/docs/creating-instances#naming_your_instance)
-- `<GCS_BUCKET_NAME>` - the name of the GCS regional bucket. See [Bucket naming guidelines](https://cloud.google.com/storage/docs/naming-buckets) 
-- `<GCS_DBS_PATH>` - the path to the GCS location of the genetic databases and model parameters. 
+- `<WORKBENCH_INSTANCE_NAME>` - the name for the Vertex Workbench instance, ex: alpha-wb
+- `<FILESTORE_INSTANCE_ID>` - the instance ID of the Filestore instance. See [Naming your instance](https://cloud.google.com/filestore/docs/creating-instances#naming_your_instance). Example: `alphaf-nfs`
+- `<GCS_BUCKET_NAME>` - the name of the GCS regional bucket. See [Bucket naming guidelines](https://cloud.google.com/storage/docs/naming-buckets)
+- `<GCS_DBS_PATH>` - the path to the GCS location of the genetic databases and model parameters.
+- `<ARTIFACT_REGISTRY_REPO_NAME>` - the Artifact Registry repository name to upload pipeline images images. Example: `alphaf-kfp`
+- (Optional) `CLIENT_ID` from OAuth Consent Screen. Populate this value later when doing setup for Alphafold Portal
+- (Optional) `CLIENT_SECRET` from OAuth Consent Screen. Populate this value later when doing setup for Alphafold Portal
+- (Optional) `FLASK_SECRET` by generating random string. See [Generate Random UUID](https://www.uuidgenerator.net/). Populate this value later when doing setup for Alphafold Portal
+- (Optional) `IS_GCR_IO_REPO` "true" means you've used gcr.io before or have existing Alphafold Pipeline set up, stick with it. "false" means you're using new Alphafold Pipeline setup, skip gcr.io for now. Populate this value later when doing setup for Alphafold Portal
 
 ```bash
 cp ${TERRAFORM_RUN_DIR}/terraform-sample.tfvars ${TERRAFORM_RUN_DIR}/terraform.tfvars
@@ -167,6 +157,23 @@ Edit the Terraform variables file. If using Vim:
 ```bash
  vim ${TERRAFORM_RUN_DIR}/terraform.tfvars
 ```
+
+The following is only a sample values to illustrate .tfvars file actual values, please modify the values accordingly:
+
+```
+project_id              = "my-project-1"
+region                  = "us-central1"
+zone                    = "us-central1-b"
+network_name            = "alphaf-network"
+subnet_name             = "alphaf-subnetwork"
+workbench_instance_name = "alphaf-wb"
+filestore_instance_id   = "alphaf-nfs"
+gcs_bucket_name         = "my-project-1-alphaf-bucket"
+gcs_dbs_path            = "alphafold-uscentral-dbcopy/new/af-dataset"
+ar_repo_name            = "alphaf-kfp"
+```
+
+> Note: gcs_dbs_path shouldn't use `gs://` prefix.
 
 **Notes:**
 - Terraform will copy the databases replicating a folder structure on GCS. Terrafom will also copy model parameters to the regional bucket. 
@@ -187,25 +194,15 @@ In addition to provisioning and configuring the required services, the Terraform
 - Don't move or delete the terraform state file, called `terraform.tfstate` before reading the official Terraform documentation**
 
 
-### Step 4. Build the container image that encapsulates custom KFP components used by the inference pipeline
+### (Optional) Setup Alphafold Portal
 
-In order to make the solution work with new generation GPU of Nvidia L4, we have upgraded CUDA version to 11.8.0 in the Dockerfile. However, it's found such container image will cause Relax step failure in the pipelines. So before a formal fix is provied, please follow the steps below to create two containter images, one for CUDA 11.1.1 and the other for CUDA 11.8.0. When prediting proteins with A100, T4 or V100, use the former while use the latter with L4. 
+Follow the README.md under `$SOURCE_ROOT/env-setup-portal` directory, or view the README directly from Github:
 
-```bash
-PROJECT_ID=$(gcloud config list --format 'value(core.project)')
-IMAGE_URI=gcr.io/${PROJECT_ID}/alphafold-components
-
-cd ${SOURCE_ROOT}
-gcloud builds submit --timeout "2h" --tag ${IMAGE_URI} . --machine-type=e2-highcpu-8
-gcloud -q container images add-tag ${IMAGE_URI}:latest ${IMAGE_URI}:cuda-1180
-cp Dockerfile Dockerfile_bak
-cp Dockerfile_cuda1111 Dockerfile
-gcloud builds submit --timeout "2h" --tag ${IMAGE_URI}:cuda-1111 . --machine-type=e2-highcpu-8
-mv Dockerfile_bak Dockerfile
+```
+https://github.com/GoogleCloudPlatform/vertex-ai-alphafold-inference-pipeline/blob/alphafold-portal/env-setup-portal/README.md
 ```
 
-
-### Step 5. Preparing Vertex Workbench
+### (Optional) Preparing Vertex Workbench
 
 In the GCP project, a Vertex Workbench user-managed notebook instance is used as a development/experimentation environment to customize, submit, and analyze inference pipelines runs. There are a couple of setup steps that are required before you can use example notebooks.
 
@@ -238,3 +235,7 @@ cd ${TERRAFORM_RUN_DIR}
 
 terraform -chdir="${TERRAFORM_RUN_DIR}" destroy
 ```
+
+## What Next?
+
+Check out Alphafold Portal (User Interface) for Vertex AI Alphafold Inference Pipeline installation guide [here](https://github.com/GoogleCloudPlatform/vertex-ai-alphafold-inference-pipeline/blob/alphafold-portal/env-setup-portal/README.md).

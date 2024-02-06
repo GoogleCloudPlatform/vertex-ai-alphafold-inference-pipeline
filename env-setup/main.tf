@@ -35,5 +35,28 @@ data "google_project" "project" {
   project_id = var.project_id
 }
 
-
+# Enable required APIs
+resource "google_project_service" "enable_required_services" {
+  project            = var.project_id
+  disable_on_destroy = false
+  for_each           = toset([
+    "artifactregistry.googleapis.com",
+    "cloudbuild.googleapis.com",
+    "compute.googleapis.com",
+    "cloudresourcemanager.googleapis.com",
+    "iamcredentials.googleapis.com",
+    "iam.googleapis.com",
+    "container.googleapis.com",
+    "cloudtrace.googleapis.com",
+    "monitoring.googleapis.com",
+    "logging.googleapis.com",
+    "notebooks.googleapis.com",
+    "aiplatform.googleapis.com",
+    "file.googleapis.com",
+    "servicenetworking.googleapis.com",
+    "storage.googleapis.com",
+    "run.googleapis.com"
+  ])
+  service = each.key
+}
 

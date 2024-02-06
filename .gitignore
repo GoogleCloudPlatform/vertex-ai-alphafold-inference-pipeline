@@ -148,9 +148,6 @@ dmypy.json
 #npm modules
 node_modules
 
-#compiled pipeline
-*.json
-
 #pytest
 pytest.ini
 
@@ -177,7 +174,7 @@ env.sh
 # VS code configurations
 .vscode
 
-*.lock
+
 **/tests/artifacts 
 
 *.code-workspace
@@ -195,6 +192,3 @@ env.sh
 # IntelliJ IDEA files
 *.iml
 .idea
-
-# Kubeflow Pipelines YAML files
-*.yaml

@@ -15,6 +15,8 @@
 
 
 resource "google_storage_bucket" "artifact_repo" {
+  depends_on  = [google_project_service.enable_required_services]
+
   name                        = var.gcs_bucket_name
   location                    = var.region
   storage_class               = "REGIONAL"

@@ -15,6 +15,7 @@
 
 
 resource "null_resource" "copy_datasets" {
+  depends_on  = [google_project_service.enable_required_services]
 
   triggers = {
     always_run     = timestamp()
