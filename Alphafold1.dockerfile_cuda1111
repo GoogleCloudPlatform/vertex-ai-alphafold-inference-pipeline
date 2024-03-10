@@ -17,6 +17,7 @@ FROM nvidia/cuda:${CUDA}-cudnn8-runtime-ubuntu18.04
 # FROM directive resets ARGS, so we specify again (the value is retained if
 # previously set).
 ARG CUDA
+ARG ALPHAFOLD_COMMIT=032e2f2
 
 # Use bash to support string substitution.
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -53,9 +54,6 @@ RUN wget -q -P /tmp \
 
 # Install conda packages.
 ENV PATH="/opt/conda/bin:$PATH"
-##  Bug-Fix: Running the conda version 4.13.0, we face an incompatibility issue with python 3.11. 
-##  Issue and fix appled as suggested in this github issue: https://github.com/deepmind/alphafold/issues/798
-#RUN conda install -qy conda==4.13.0 \
 RUN conda install -qy conda==24.1.2 \
     && conda install -y -c conda-forge \
       openmm=7.7.0 \
@@ -66,6 +64,7 @@ RUN conda install -qy conda==24.1.2 \
       && conda clean --all --force-pkgs-dirs --yes
 
 RUN git clone https://github.com/deepmind/alphafold.git /app/alphafold
+RUN git -C /app/alphafold reset --hard $ALPHAFOLD_COMMIT
 RUN wget -q -P /app/alphafold/alphafold/common/ \
   https://git.scicore.unibas.ch/schwede/openstructure/-/raw/7102c63615b64735c4941278d92b554ec94415f8/modules/mol/alg/src/stereo_chemical_props.txt
 
