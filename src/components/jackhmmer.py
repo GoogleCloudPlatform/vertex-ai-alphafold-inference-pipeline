@@ -18,9 +18,7 @@ from kfp.v2.dsl import Artifact
 from kfp.v2.dsl import Input
 from kfp.v2.dsl import Output
 
-import sys
-sys.path.append('..')
-import config
+import config as config
 
 
 @dsl.component(

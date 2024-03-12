@@ -180,7 +180,7 @@ ar_repo_name            = "alphaf-kfp"
 - The parameters should be in the `<GCS_DBS_PATH>/params`
 
 
-Apply Terraform configuration. This step may take a few minutes so be patient.
+Apply Terraform configuration. This step may take a few hours so be patient. Reason: the steps to build two CUDA images have been moved as part of the terraform script ([pipeline_images.tf](https://github.com/GoogleCloudPlatform/vertex-ai-alphafold-inference-pipeline/blob/main/env-setup/pipeline_images.tf)). You'll need to monitor the 1.5-2 hours long image build job, either from Log Explorer or from the URL generated from the `terraform apply` output. You may leave the Cloud Shell as it is a background process. This is an improved process from previous version where you'll need to keep the terminal session running to complete the image build process.
 
 ```bash
 terraform -chdir="${TERRAFORM_RUN_DIR}" init
@@ -194,15 +194,7 @@ In addition to provisioning and configuring the required services, the Terraform
 - Don't move or delete the terraform state file, called `terraform.tfstate` before reading the official Terraform documentation**
 
 
-### (Optional) Setup Alphafold Portal
-
-Follow the README.md under `$SOURCE_ROOT/env-setup-portal` directory, or view the README directly from Github:
-
-```
-https://github.com/GoogleCloudPlatform/vertex-ai-alphafold-inference-pipeline/blob/alphafold-portal/env-setup-portal/README.md
-```
-
-### (Optional) Preparing Vertex Workbench
+### Preparing Vertex Workbench
 
 In the GCP project, a Vertex Workbench user-managed notebook instance is used as a development/experimentation environment to customize, submit, and analyze inference pipelines runs. There are a couple of setup steps that are required before you can use example notebooks.
 
@@ -212,6 +204,15 @@ On the JupyterLab interface, launch a new Terminal tab and execute the following
 
 ```bash
 git clone https://github.com/GoogleCloudPlatform/vertex-ai-alphafold-inference-pipeline.git
+```
+
+
+### (Optional) Setup Alphafold Portal
+
+Follow the README.md under `$SOURCE_ROOT/env-setup-portal` directory, or view the README directly from Github:
+
+```
+https://github.com/GoogleCloudPlatform/vertex-ai-alphafold-inference-pipeline/blob/alphafold-portal/env-setup-portal/README.md
 ```
 
 ### Congratulations!

@@ -16,14 +16,12 @@
 
 from google_cloud_pipeline_components.v1.custom_job import create_custom_training_job_from_component
 from kfp.v2 import dsl
-import sys
-sys.path.append('..')
 
-import config
-from components import configure_run as ConfigureRunOp
-from components import data_pipeline
-from components import predict as PredictOp
-from components import relax as RelaxOp
+import config as config
+from components import  configure_run as ConfigureRunOp
+from components import  data_pipeline
+from components import  predict as PredictOp
+from components import  relax as RelaxOp
 import os
 
 DataPipelineOp = create_custom_training_job_from_component(
@@ -40,17 +38,17 @@ DataPipelineOp = create_custom_training_job_from_component(
 JobPredictOp = create_custom_training_job_from_component(
     PredictOp,
     display_name = 'Predict',
-    machine_type = 'g2-standard-12' if os.environ['PREDICT_MACHINE_TYPE'] is None else os.environ['PREDICT_MACHINE_TYPE'],
-    accelerator_type = 'NVIDIA_L4' if os.environ['PREDICT_ACCELERATOR_TYPE'] is None else os.environ['PREDICT_ACCELERATOR_TYPE'],
-    accelerator_count = '1' if os.environ['PREDICT_ACCELERATOR_COUNT'] is None else os.environ['PREDICT_ACCELERATOR_COUNT']
+    machine_type = 'g2-standard-12' if 'PREDICT_MACHINE_TYPE' not in os.environ else os.environ['PREDICT_MACHINE_TYPE'],
+    accelerator_type = 'NVIDIA_L4' if 'PREDICT_ACCELERATOR_TYPE' not in os.environ else os.environ['PREDICT_ACCELERATOR_TYPE'],
+    accelerator_count = '1' if 'PREDICT_ACCELERATOR_COUNT' not in os.environ else os.environ['PREDICT_ACCELERATOR_COUNT']
 )
 
 JobRelaxOp = create_custom_training_job_from_component(
     RelaxOp,
     display_name = 'Relax',
-    machine_type = 'g2-standard-12' if os.environ['RELAX_MACHINE_TYPE'] is None else os.environ['RELAX_MACHINE_TYPE'],
-    accelerator_type = 'NVIDIA_L4' if os.environ['RELAX_ACCELERATOR_TYPE'] is None else os.environ['RELAX_ACCELERATOR_TYPE'],
-    accelerator_count = '1' if os.environ['RELAX_ACCELERATOR_COUNT'] is None else os.environ['RELAX_ACCELERATOR_COUNT']
+    machine_type = 'g2-standard-12' if 'RELAX_MACHINE_TYPE' not in os.environ else os.environ['RELAX_MACHINE_TYPE'],
+    accelerator_type = 'NVIDIA_L4' if 'RELAX_ACCELERATOR_TYPE' not in os.environ else os.environ['RELAX_ACCELERATOR_TYPE'],
+    accelerator_count = '1' if 'RELAX_ACCELERATOR_COUNT' not in os.environ else os.environ['RELAX_ACCELERATOR_COUNT']
 )
 
 @dsl.pipeline(
@@ -75,7 +73,7 @@ def alphafold_inference_pipeline(
   ).set_display_name('Configure Pipeline Run')
 
   model_parameters = dsl.importer(
-      artifact_uri=config.MODEL_PARAMS_GCS_LOCATION,
+      artifact_uri=os.environ['MODEL_PARAMS_GCS_LOCATION'],
       artifact_class=dsl.Artifact,
       reimport=True
   ).set_display_name('Model parameters')

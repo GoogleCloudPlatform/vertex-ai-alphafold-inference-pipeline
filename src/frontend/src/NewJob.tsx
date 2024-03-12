@@ -166,7 +166,7 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
     }
   };
 
-  const handleCheckFasta = (fastaContent: string | null) => {
+  const handleCheckFasta = (fastaContent: string | null, fileObject: any) => {
     if (!accessToken) {
       setSnackbarContent("AccessToken is missing. Please login first.");
       setOpen(true);
@@ -175,7 +175,7 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
     setLoading(true);
 
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", fileObject);
 
     return axios
       .post(`${BACKEND_HOST}/check-fasta`, formData, {
@@ -272,7 +272,7 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
                 reader.onload = () => {
                   setFile(file);
                   setFileName(file.name);
-                  handleCheckFasta(reader.result?reader.result.toString():"");
+                  handleCheckFasta(reader.result?reader.result.toString():"", file);
                 };
                 if (file) {
                   reader.readAsText(file);
@@ -369,7 +369,7 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
               </FormControl>
               <TextField
                 required={true}
-                onBlur={(e) => handleChange(e, setPredictionCount)}
+                onChange={(e) => handleChange(e, setPredictionCount)}
                 label="Multimer Predictions per model (#)"
                 sx={{ width: "100%", mt: 2 }}
                 size="small"
