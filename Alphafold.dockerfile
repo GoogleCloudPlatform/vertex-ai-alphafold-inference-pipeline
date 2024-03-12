@@ -17,12 +17,12 @@ FROM nvidia/cuda:${CUDA}-cudnn8-runtime-ubuntu18.04
 # FROM directive resets ARGS, so we specify again (the value is retained if
 # previously set).
 ARG CUDA
-ARG ALPHAFOLD_VERSION=v2.3.2
+ARG ALPHAFOLD_COMMIT=032e2f2
 
 # Use bash to support string substitution.
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-RUN apt-get update \ 
+RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
         build-essential \
         cmake \
@@ -54,19 +54,17 @@ RUN wget -q -P /tmp \
 
 # Install conda packages.
 ENV PATH="/opt/conda/bin:$PATH"
-##  Bug-Fix: Running the conda version 4.13.0, we face an incompatibility issue with python 3.11. 
-##  Issue and fix appled as suggested in this github issue: https://github.com/deepmind/alphafold/issues/798
-#RUN conda install -qy conda==4.13.0 \
-RUN conda install -qy conda==23.1.0 \
+RUN conda install -qy conda==24.1.2 \
     && conda install -y -c conda-forge \
-      openmm=7.5.1 \
+      openmm=7.7.0 \
       pdbfixer \
       pip \
-      python=3.9 \
+      python=3.10 \
       && conda install -y -c nvidia/label/cuda-${CUDA} cuda-libraries-dev cuda-nvcc cuda-nvtx cuda-cupti \
       && conda clean --all --force-pkgs-dirs --yes
 
-RUN git clone --branch $ALPHAFOLD_VERSION https://github.com/deepmind/alphafold.git /app/alphafold
+RUN git clone https://github.com/deepmind/alphafold.git /app/alphafold
+RUN git -C /app/alphafold reset --hard $ALPHAFOLD_COMMIT
 RUN wget -q -P /app/alphafold/alphafold/common/ \
   https://git.scicore.unibas.ch/schwede/openstructure/-/raw/7102c63615b64735c4941278d92b554ec94415f8/modules/mol/alg/src/stereo_chemical_props.txt
 
@@ -77,10 +75,6 @@ RUN pip3 install --upgrade pip --no-cache-dir \
       jax==0.4.13 \
       jaxlib==0.4.13+cuda11.cudnn86 \
       -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
-
-# Apply OpenMM patch.
-WORKDIR /opt/conda/lib/python3.9/site-packages
-RUN patch -p0 < /app/alphafold/docker/openmm.patch
 
 # Add SETUID bit to the ldconfig binary so that non-root users can run it.
 RUN chmod u+s /sbin/ldconfig.real
