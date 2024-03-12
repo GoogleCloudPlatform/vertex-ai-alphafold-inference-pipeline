@@ -31,10 +31,8 @@ from flask_cors import CORS
 import jwt
 from kfp.v2 import compiler
 
-import sys
-sys.path.append('..')
-import utils.fasta_utils as fasta_utils
 import utils.compile_utils as compile_utils
+from utils import compile_utils
 
 # Basic running parameters
 PROJECT_ID = os.environ.get("PROJECT_ID")  # Change to your project ID
@@ -81,7 +79,7 @@ def upload_to_bucket(blob_name, the_file, bucket_name):
 def download_file(blob_name: str) -> bytes:
     bucket = storage_client.bucket(BUCKET_NAME)
     blob = bucket.blob(blob_name)
-    print(f'Blob: {blob}')
+    print(f'File Blob: {blob}')
     if blob.exists():
         return blob.download_as_bytes()
     else:

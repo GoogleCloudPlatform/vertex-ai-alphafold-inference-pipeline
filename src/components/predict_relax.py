@@ -21,10 +21,7 @@ from kfp.v2.dsl import Input
 from kfp.v2.dsl import Output
 from typing import List
 
-import sys
-sys.path.append('..')
-import config
-
+import config as config
 
 @dsl.component(
     base_image=config.ALPHAFOLD_COMPONENTS_IMAGE

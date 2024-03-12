@@ -16,14 +16,12 @@
 
 from google_cloud_pipeline_components.v1.custom_job import create_custom_training_job_from_component
 from kfp.v2 import dsl
-import sys
-sys.path.append('..')
 
-import config
-from components import configure_run as ConfigureRunOp
-from components import data_pipeline
-from components import predict as PredictOp
-from components import relax as RelaxOp
+import config as config
+from components import  configure_run as ConfigureRunOp
+from components import  data_pipeline
+from components import  predict as PredictOp
+from components import  relax as RelaxOp
 import os
 
 DataPipelineOp = create_custom_training_job_from_component(
@@ -75,7 +73,7 @@ def alphafold_inference_pipeline(
   ).set_display_name('Configure Pipeline Run')
 
   model_parameters = dsl.importer(
-      artifact_uri=config.MODEL_PARAMS_GCS_LOCATION,
+      artifact_uri=os.environ['MODEL_PARAMS_GCS_LOCATION'],
       artifact_class=dsl.Artifact,
       reimport=True
   ).set_display_name('Model parameters')
