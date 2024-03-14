@@ -3,7 +3,7 @@ steps:
   args: [ 'build',
           '.',
           '-f',
-          './Alphafold1.dockerfile_cuda1111',
+          './Alphafold1_cuda1111.dockerfile',
           '-t',
           '${_CONTAINER_IMAGE_TAG}:cuda-1111'
   ]
