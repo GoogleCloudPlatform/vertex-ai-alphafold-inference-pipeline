@@ -31,8 +31,9 @@ from flask_cors import CORS
 import jwt
 from kfp.v2 import compiler
 
-import utils.compile_utils as compile_utils
 from utils import compile_utils
+from utils import fasta_utils
+
 
 # Basic running parameters
 PROJECT_ID = os.environ.get("PROJECT_ID")  # Change to your project ID
