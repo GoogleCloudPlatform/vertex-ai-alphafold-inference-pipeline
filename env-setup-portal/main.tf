@@ -12,6 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+terraform {
+  required_version = ">= 0.14"
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 4.15"
+    }
+  }
+  provider_meta "google" {
+    module_name = "cloud-solutions/alphafold-portal-v1.0"
+  }
+}
 provider "google" {
   project = var.project_id
   region  = var.region
