@@ -15,12 +15,14 @@
 terraform {
   required_version = ">= 0.14"
   required_providers {
-    google = "~> 4.15"
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 4.15"
+    }
   }
-  #    backend "gcs" {
-  #    bucket  = "PROJECT_ID-tf-state"
-  #    prefix  = "af-demo"
-  #  }
+  provider_meta "google" {
+    module_name = "cloud-solutions/alphafold_pipeline-v1.0"
+  }
 }
 
 provider "google" {
