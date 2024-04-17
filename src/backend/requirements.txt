@@ -2,7 +2,7 @@ Authlib==1.2.1
 biopython==1.81
 Flask==2.2.5
 Flask-Cors==4.0.0
-gunicorn==20.1.0
+gunicorn==22.0.0
 google-cloud-common==1.2.0
 google-cloud-notebooks==1.7.1
 google-cloud-aiplatform==1.28.1
