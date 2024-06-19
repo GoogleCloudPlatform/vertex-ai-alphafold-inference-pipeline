@@ -105,6 +105,16 @@ function calculateAcceleratorCount(machineType: string): string {
       return "8";
     case "a2-megagpu-16g":
       return "16";
+    case "a2-ultragpu-1g":
+      return "1";
+    case "a2-ultragpu-2g":
+      return "2";
+    case "a2-ultragpu-4g":
+      return "4";
+    case "a2-ultragpu-8g":
+      return "8";
+    case "a3-highgpu-8g":
+      return "8";
     default:
       return "1";
   }
