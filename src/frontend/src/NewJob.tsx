@@ -423,19 +423,34 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
                     g2-standard-48 (L4)
                   </MenuItem>
                   <MenuItem value={"a2-highgpu-1g"}>
-                    a2-highgpu-1g (A100)
+                    a2-highgpu-1g (A100 40GB HBM)
                   </MenuItem>
                   <MenuItem value={"a2-highgpu-2g"}>
-                    a2-highgpu-2g (A100)
+                    a2-highgpu-2g (A100 40GB HBM)
                   </MenuItem>
                   <MenuItem value={"a2-highgpu-4g"}>
-                    a2-highgpu-4g (A100)
+                    a2-highgpu-4g (A100 40GB HBM)
                   </MenuItem>
                   <MenuItem value={"a2-highgpu-8g"}>
-                    a2-highgpu-8g (A100)
+                    a2-highgpu-8g (A100 40GB HBM)
                   </MenuItem>
                   <MenuItem value={"a2-megagpu-16g"}>
-                    a2-highgpu-16g (A100)
+                    a2-megagpu-16g (A100 40GB HBM)
+                  </MenuItem>
+                  <MenuItem value={"a2-ultragpu-1g"}>
+                    a2-ultragpu-1g (A100 80GB HBM)
+                  </MenuItem>
+                  <MenuItem value={"a2-ultragpu-2g"}>
+                    a2-ultragpu-2g (A100 80GB HBM)
+                  </MenuItem>
+                  <MenuItem value={"a2-ultragpu-4g"}>
+                    a2-ultragpu-4g (A100 80GB HBM)
+                  </MenuItem>
+                  <MenuItem value={"a2-ultragpu-8g"}>
+                    a2-ultragpu-8g (A100 80GB HBM)
+                  </MenuItem>
+                  <MenuItem value={"a3-highgpu-8g"}>
+                    a2-ultragpu-16g (H100 80GB HBM)
                   </MenuItem>
                 </Select>
               </FormControl>
@@ -482,6 +497,21 @@ function NewJob({ onClose }: { createMode: any; onClose: any; onError: any }) {
                   </MenuItem>
                   <MenuItem value={"a2-megagpu-16g"}>
                     a2-highgpu-16g (A100)
+                  </MenuItem>
+                  <MenuItem value={"a2-ultragpu-1g"}>
+                    a2-ultragpu-1g (A100 80GB HBM)
+                  </MenuItem>
+                  <MenuItem value={"a2-ultragpu-2g"}>
+                    a2-ultragpu-2g (A100 80GB HBM)
+                  </MenuItem>
+                  <MenuItem value={"a2-ultragpu-4g"}>
+                    a2-ultragpu-4g (A100 80GB HBM)
+                  </MenuItem>
+                  <MenuItem value={"a2-ultragpu-8g"}>
+                    a2-ultragpu-8g (A100 80GB HBM)
+                  </MenuItem>
+                  <MenuItem value={"a3-highgpu-8g"}>
+                    a2-ultragpu-16g (H100 80GB HBM)
                   </MenuItem>
                 </Select>
               </FormControl>
