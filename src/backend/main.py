@@ -300,9 +300,9 @@ def valid_user():
     return user_info
 
 def decide_accelerator_type(machine_type):
-    if machine_type.startswith("a2-highgpu"):
+    if machine_type.startswith("a3-highgpu"):
         return "NVIDIA_H100_80GB"
-    elif machine_type.startswith("a2-highgpu"):
+    elif machine_type.startswith("a2-ultragpu"):
         return "NVIDIA_A100_80GB"
     elif machine_type.startswith("a2-highgpu"):
         return "NVIDIA_TESLA_A100"
