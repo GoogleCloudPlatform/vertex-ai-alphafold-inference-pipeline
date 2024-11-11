@@ -6,8 +6,8 @@ google-cloud-common==1.2.0
 google-cloud-notebooks==1.7.1
 shapely==1.8.5.post1
 pygeos==0.12.0
-geopandas
-google-cloud-aiplatform
+geopandas==0.14.4
+google-cloud-aiplatform==1.71.1
 google-cloud-pipeline-components==1.0.44
 biopython==1.81
 google-cloud-filestore==1.6.1
