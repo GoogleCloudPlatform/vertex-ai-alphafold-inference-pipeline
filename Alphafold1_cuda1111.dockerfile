@@ -54,7 +54,7 @@ RUN wget -q -P /tmp \
 
 # Install conda packages.
 ENV PATH="/opt/conda/bin:$PATH"
-RUN conda install -qy conda==24.1.2 \
+RUN conda install -qy conda==24.11.2 \
     && conda install -y -c conda-forge \
       openmm=7.7.0 \
       cudatoolkit==${CUDA_VERSION} \
