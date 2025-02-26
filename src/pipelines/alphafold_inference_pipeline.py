@@ -17,12 +17,14 @@
 from google_cloud_pipeline_components.v1.custom_job import create_custom_training_job_from_component
 from kfp.v2 import dsl
 
+import os
+
 import config as config
 from components import  configure_run as ConfigureRunOp
 from components import  data_pipeline
 from components import  predict as PredictOp
 from components import  relax as RelaxOp
-import os
+
 
 DataPipelineOp = create_custom_training_job_from_component(
     data_pipeline,
