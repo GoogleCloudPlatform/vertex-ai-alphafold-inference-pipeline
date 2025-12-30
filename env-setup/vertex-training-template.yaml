@@ -18,11 +18,11 @@ workerPoolSpecs:
         machineType: n1-standard-16
       replicaCount: 1
       containerSpec:
-        imageUri: gcr.io/cloud-builders/gsutil
+        imageUri: gcr.io/cloud-builders/gcloud
         args: 
-        - -m 
+        - storage
         - rsync
-        - -r
+        - --recursive
         - GCS_PATH
         - MOUNT_POINT
       nfsMounts:

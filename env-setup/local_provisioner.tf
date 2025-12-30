@@ -34,7 +34,7 @@ resource "null_resource" "copy_datasets" {
                 GCS_PARAMS_PATH=gs://${google_storage_bucket.artifact_repo.name}
                 MOUNT_POINT=/mnt/nfs/alphafold
 
-                gsutil -m cp -r $GCS_PATH/params/ $GCS_PARAMS_PATH
+                gcloud storage cp --recursive $GCS_PATH/params/ $GCS_PARAMS_PATH
 
                 sed -i s#NETWORK_ID#$NETWORK_ID#g vertex-training-template.yaml 
                 sed -i s#FILESTORE_IP#${self.triggers.FILESTORE_IP}#g vertex-training-template.yaml
