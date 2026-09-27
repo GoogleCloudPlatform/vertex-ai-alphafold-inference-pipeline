@@ -4,6 +4,8 @@ This repository compiles prescriptive guidance and code samples demonstrating ho
 
 Code sample base on v2.3.2 of AlphaFold.
 
+Optional companion: [Read online](https://webeditions.page/works/highly-accurate-protein-structure-prediction-with-alphafold/?via=placement:d7aa421b1830aa222ce4) (Nature/PMC source of record unchanged).
+
 For protein viewer in Alphafold Portal we're using 3Dmol CDN binary which licensed under BSD 3-Clause License.
 
 Note: Alphafold Portal README will be available in the same repository [here](https://github.com/GoogleCloudPlatform/vertex-ai-alphafold-inference-pipeline/blob/alphafold-portal/env-setup-portal/README.md).
